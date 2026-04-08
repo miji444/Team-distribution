@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Team Distribution Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0F1C2E;--navy2:#162338;--navy3:#1E2F45;
+  --blue:#2563EB;--blue-l:#EFF6FF;--blue-m:#BFDBFE;
+  --teal:#0D9488;--teal-l:#CCFBF1;
+  --purple:#7C3AED;--purple-l:#EDE9FE;
+  --amber:#D97706;--amber-l:#FEF3C7;
+  --rose:#BE185D;--rose-l:#FCE7F3;
+  --green:#16A34A;--green-l:#DCFCE7;
+  --red:#DC2626;--red-l:#FEF2F2;
+  --slate:#64748B;--slate-l:#F1F5F9;
+  --border:#E2E8F0;--border2:#CBD5E1;
+  --text:#0F172A;--text2:#475569;--text3:#94A3B8;
+  --white:#fff;--bg:#F8FAFC;
+  --r:8px;--rl:12px;--rxl:16px;
+  --f:'Inter',sans-serif;
+  --shadow:0 1px 3px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--f);background:var(--bg);color:var(--text);font-size:13px}
+
+/* ── LOGIN ── */
+#login{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--navy)}
+.lbox{background:#162338;border:1px solid rgba(255,255,255,.08);border-radius:var(--rxl);padding:40px;width:340px;text-align:center}
+.llogo{width:48px;height:48px;background:var(--blue);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:22px;color:#fff;font-weight:700}
+.lbox h1{font-size:20px;font-weight:700;color:#fff;margin-bottom:5px}
+.lbox small{font-size:11px;color:rgba(255,255,255,.3);display:block;margin-bottom:24px}
+.linp{width:100%;padding:10px 14px;border-radius:var(--r);border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#fff;font-family:var(--f);font-size:13px;margin-bottom:8px;outline:none;transition:border-color .2s}
+.linp:focus{border-color:var(--blue)}
+.linp::placeholder{color:rgba(255,255,255,.2)}
+.lbtn{width:100%;padding:11px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-family:var(--f);font-size:13px;font-weight:600;cursor:pointer;margin-top:4px;transition:background .2s}
+.lbtn:hover{background:#1D4ED8}
+.lerr{font-size:11px;color:#F87171;margin-top:8px;display:none}
+.lhint{margin-top:16px;font-size:10px;color:rgba(255,255,255,.18)}
+
+/* ── APP SHELL ── */
+#app{display:none;min-height:100vh;flex-direction:column}
+.hdr{background:var(--navy);height:54px;display:flex;align-items:center;padding:0 18px;gap:12px;flex-shrink:0}
+.brand{font-size:14px;font-weight:700;color:#fff;flex:1;display:flex;align-items:center;gap:8px}
+.brand em{font-style:normal;font-size:10px;background:var(--blue);color:#fff;padding:2px 7px;border-radius:5px;font-weight:600}
+.nav{display:flex;gap:2px}
+.ntab{font-size:12px;padding:5px 14px;border-radius:var(--r);color:rgba(255,255,255,.5);cursor:pointer;border:none;background:transparent;font-family:var(--f);font-weight:500;transition:all .15s}
+.ntab:hover{color:#fff;background:rgba(255,255,255,.08)}
+.ntab.on{color:#fff;background:rgba(255,255,255,.14)}
+.hbtns{display:flex;gap:6px}
+.hb{font-size:11px;padding:5px 12px;border-radius:var(--r);border:1px solid rgba(255,255,255,.13);background:transparent;color:rgba(255,255,255,.75);cursor:pointer;font-family:var(--f);font-weight:500;transition:all .15s}
+.hb:hover{background:rgba(255,255,255,.09)}
+.hb.prim{background:var(--blue);border-color:var(--blue);color:#fff}
+.hb.prim:hover{background:#1D4ED8}
+
+.content{flex:1;padding:14px 18px;overflow:auto}
+.pg{display:none}.pg.on{display:block}
+
+/* ── TOP BAR ── */
+.btop{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.btop h2{font-size:14px;font-weight:600;flex:1}
+.sinp{font-size:11px;padding:5px 10px;border:1px solid var(--border);border-radius:var(--r);background:#fff;color:var(--text);width:150px;font-family:var(--f);outline:none}
+.sinp:focus{border-color:var(--blue)}
+.tb{font-size:11px;padding:5px 12px;border:1px solid var(--border);border-radius:var(--r);background:#fff;color:var(--text);cursor:pointer;font-family:var(--f);font-weight:500;white-space:nowrap;transition:all .15s}
+.tb:hover{background:var(--slate-l)}
+.tb:disabled{opacity:.35;cursor:default}
+.tb.acc{background:var(--navy);color:#fff;border-color:var(--navy)}
+.tb.acc:hover{background:var(--navy2)}
+.tb.grn{background:var(--green);color:#fff;border-color:var(--green)}
+.tb.grn:hover{background:#15803D}
+.tb.red{background:var(--red);color:#fff;border-color:var(--red)}
+
+/* ── LEGEND ── */
+.leg{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:7px 12px;background:#fff;border:1px solid var(--border);border-radius:var(--rl);margin-bottom:8px;box-shadow:var(--shadow)}
+.li{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text2)}
+.ld{width:7px;height:7px;border-radius:50%}
+.lb{width:22px;height:12px;border-radius:3px}
+.ls{width:1px;height:14px;background:var(--border)}
+
+/* ── ACCOM BAR ── */
+.abar{display:flex;flex-wrap:wrap;gap:7px;align-items:center;padding:6px 12px;background:#EFF6FF;border:1px solid var(--blue-m);border-radius:var(--r);margin-bottom:12px}
+.ap{font-size:9px;padding:2px 6px;border-radius:5px;font-weight:700}
+.abar .al{font-size:10px;color:var(--blue);font-weight:600}
+.abar .ad{font-size:10px;color:var(--text3)}
+
+/* ── BOARD LAYOUT ── */
+.blayout{display:grid;grid-template-columns:1fr 235px;gap:12px;align-items:start}
+
+/* ── SECTION ── */
+.section{margin-bottom:10px;border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;background:#fff;box-shadow:var(--shadow)}
+.shdr{display:flex;align-items:center;gap:8px;padding:9px 14px;cursor:pointer;user-select:none}
+.shdr h3{font-size:12px;font-weight:700;color:#fff;flex:1}
+.shdr .sc{font-size:10px;background:rgba(255,255,255,.22);color:#fff;border-radius:7px;padding:1px 8px}
+.shdr .sa{font-size:10px;color:rgba(255,255,255,.5)}
+.sbody{padding:10px 12px;background:#fff}
+
+/* ── CLUSTER ── */
+.cluster{margin-bottom:14px;border:1px solid var(--border);border-radius:var(--rl);overflow:hidden}
+.cluster:last-child{margin-bottom:0}
+.cluster-hdr{display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--slate-l);border-bottom:1px solid var(--border)}
+.cluster-hdr h4{font-size:11px;font-weight:700;color:var(--text);flex:1}
+.cluster-stats{display:flex;gap:6px;align-items:center}
+.cstat{font-size:10px;color:var(--text3);background:#fff;border:1px solid var(--border);border-radius:5px;padding:2px 7px}
+.cstat strong{color:var(--text);font-weight:600}
+.cluster-btns{display:flex;gap:4px}
+.cbtn{font-size:10px;padding:3px 9px;border:1px solid var(--border);border-radius:var(--r);background:#fff;color:var(--text2);cursor:pointer;font-family:var(--f);font-weight:500;transition:all .12s}
+.cbtn:hover{background:var(--blue-l);border-color:var(--blue-m);color:var(--blue)}
+.cbtn.del-cl{color:var(--red)}
+.cbtn.del-cl:hover{background:var(--red-l);border-color:#FECACA}
+
+/* ── TEAM LINE ── */
+.team-line{display:flex;align-items:stretch;border-bottom:1px solid var(--border);background:#fff;position:relative;transition:background .15s}
+.team-line:last-child{border-bottom:none}
+.team-line:hover{background:#FAFBFC}
+
+/* Left meta strip */
+.tl-meta{width:150px;flex-shrink:0;padding:8px 10px;border-right:1px solid var(--border);background:var(--bg);display:flex;flex-direction:column;gap:4px;justify-content:center}
+.tl-type{font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;display:inline-flex;align-items:center;gap:3px;width:fit-content}
+.tl-days{font-size:10px;color:var(--text2);display:flex;align-items:center;gap:4px;margin-top:2px}
+.tl-days input{width:52px;padding:2px 5px;border:1px solid var(--border);border-radius:4px;font-size:10px;font-family:var(--f);color:var(--text);background:#fff;outline:none;text-align:center}
+.tl-days input:focus{border-color:var(--blue)}
+.tl-name{font-size:9px;color:var(--text3);margin-top:2px;font-style:italic}
+.tl-del{position:absolute;top:6px;right:8px;font-size:10px;color:var(--text3);cursor:pointer;padding:2px 5px;border-radius:4px;transition:all .12s;background:none;border:none;font-family:var(--f)}
+.tl-del:hover{color:var(--red);background:var(--red-l)}
+
+/* Cards row */
+.cards-row{display:flex;align-items:center;gap:5px;padding:8px 10px;flex:1;overflow-x:auto;flex-wrap:wrap}
+.cards-row::-webkit-scrollbar{height:3px}
+.cards-row::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* Divider arrow between role groups */
+.role-sep{color:var(--border2);font-size:16px;flex-shrink:0;line-height:1}
+
+/* ── CARD ── */
+.card{border:1px solid var(--border);border-radius:var(--r);padding:7px 9px;background:#fff;cursor:grab;position:relative;width:104px;flex-shrink:0;min-height:72px;display:flex;flex-direction:column;gap:2px;transition:border-color .12s,transform .12s,box-shadow .12s}
+.card:hover{border-color:var(--border2);background:var(--bg);box-shadow:0 2px 8px rgba(0,0,0,.08);z-index:2}
+.card.avs{border:1.5px solid var(--purple);background:var(--purple-l)}
+.card.sub{border:1.5px solid var(--amber);background:var(--amber-l)}
+.card.empty{border:1.5px dashed var(--border2);background:var(--slate-l);cursor:default;opacity:.5;min-height:72px}
+.card.over{border:2px dashed var(--blue)!important;background:var(--blue-l)!important;z-index:10}
+.card.dragging{opacity:.1;transform:scale(.9)}
+.card.lit{outline:2.5px solid var(--amber);outline-offset:2px;z-index:5}
+.card.dim{opacity:.1}
+.card.pop-out{animation:pOut .45s ease forwards}
+.card.pop-in{animation:pIn .4s cubic-bezier(.34,1.56,.64,1) forwards}
+@keyframes pOut{0%{transform:scale(1);opacity:1}25%{transform:scale(1.2) translateY(-8px);opacity:1}55%{transform:scale(.85) translateY(5px);opacity:.6}100%{transform:scale(1);opacity:1}}
+@keyframes pIn{0%{transform:scale(.6) translateY(-14px);opacity:0}70%{transform:scale(1.05) translateY(2px);opacity:1}100%{transform:scale(1) translateY(0);opacity:1}}
+.rdot{width:6px;height:6px;border-radius:50%;position:absolute;top:7px;right:8px}
+.lic{position:absolute;bottom:5px;right:7px;font-size:12px;line-height:1}
+.cmenu{position:fixed;z-index:900;background:#fff;border:0.5px solid var(--border2);border-radius:var(--rl);box-shadow:0 8px 32px rgba(0,0,0,.18);min-width:220px;overflow:hidden}
+.cmenu-hdr{padding:10px 14px;background:var(--navy);color:#fff}
+.cmenu-hdr .chn{font-size:13px;font-weight:600}
+.cmenu-hdr .chr{font-size:10px;color:rgba(255,255,255,.5);margin-top:1px}
+.cmenu-sec{border-bottom:0.5px solid var(--border)}
+.cmenu-sec:last-child{border-bottom:none}
+.cmenu-lbl{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:5px 14px 2px}
+.cmi{display:flex;align-items:center;gap:8px;padding:7px 14px;cursor:pointer;font-size:12px;color:var(--text);transition:background .1s;user-select:none}
+.cmi:hover{background:var(--blue-l)}
+.cmi.on{color:var(--blue);font-weight:500}
+.cmi.danger:hover{background:var(--red-l);color:var(--red)}
+.cmi .ci{width:18px;text-align:center;font-size:13px;flex-shrink:0;color:var(--text3)}
+.cmi .ck{margin-left:auto;color:var(--blue)}
+.sw-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:4px 0;max-height:340px;overflow-y:auto}
+.sw-item{border:0.5px solid var(--border);border-radius:var(--r);padding:8px 10px;cursor:pointer;transition:all .12s}
+.sw-item:hover{border-color:var(--blue);background:var(--blue-l)}
+.sw-item.cur{border-color:var(--blue);background:var(--blue-l);pointer-events:none}
+.sw-sep{grid-column:1/-1;font-size:10px;font-weight:700;color:var(--text3);padding:6px 2px 2px;border-bottom:0.5px solid var(--border);text-transform:uppercase;letter-spacing:.05em}
+.sw-cl{font-size:11px;font-weight:500;color:var(--text)}
+.sw-ld{font-size:10px;color:var(--text3)}
+
+
+.rdot{width:6px;height:6px;border-radius:50%;position:absolute;top:7px;right:8px}
+.crole{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.03em;padding-right:12px;line-height:1.2}
+.cname2{font-size:11px;font-weight:500;color:var(--text);line-height:1.35;word-break:break-word}
+.caccom{display:flex;flex-wrap:wrap;gap:2px;margin-top:3px}
+
+/* Add member button */
+.add-member-btn{width:72px;height:72px;border:1.5px dashed var(--border2);border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--text3);font-size:10px;flex-shrink:0;transition:all .15s;background:transparent;font-family:var(--f)}
+.add-member-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-l)}
+.add-member-btn .plus{font-size:18px;line-height:1;margin-bottom:2px}
+
+/* ── SIDE PANEL ── */
+.side{display:flex;flex-direction:column;gap:8px}
+.panel{border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;background:#fff;box-shadow:var(--shadow)}
+.phdr{padding:8px 12px;display:flex;align-items:center;gap:6px}
+.phdr h4{font-size:12px;font-weight:600;color:#fff;flex:1}
+.phdr .pc{font-size:10px;background:rgba(255,255,255,.22);color:#fff;border-radius:7px;padding:1px 7px}
+.pbody{padding:8px}
+.dz{border:1.5px dashed var(--border2);border-radius:var(--r);padding:10px;font-size:10px;color:var(--text3);text-align:center;margin-bottom:6px;transition:all .15s;min-height:40px;display:flex;align-items:center;justify-content:center}
+.dz.over{border-color:var(--blue);background:var(--blue-l);color:var(--blue)}
+.pchips{display:flex;flex-direction:column;gap:4px}
+.pchip{border:1px solid var(--border);border-radius:var(--r);padding:6px 9px;background:var(--bg);cursor:grab;display:flex;flex-direction:column;gap:1px;transition:all .12s}
+.pchip:hover{background:#fff;border-color:var(--border2);box-shadow:var(--shadow)}
+.pchip.avs{border:1.5px solid var(--purple);background:var(--purple-l)}
+.pchip.sub{border:1.5px solid var(--amber);background:var(--amber-l)}
+.pchip.dragging{opacity:.2}
+.pchip.over{border:1.5px dashed var(--blue)}
+.pn{font-size:11px;font-weight:500;color:var(--text)}
+.pm{font-size:9px;color:var(--text3)}
+
+.hlist{display:flex;flex-direction:column;gap:3px;max-height:260px;overflow-y:auto}
+.hitem{font-size:10px;padding:5px 8px;border-radius:var(--r);background:var(--bg);border:1px solid var(--border);color:var(--text);line-height:1.4}
+.ht{font-size:9px;color:var(--text3);display:block;margin-top:1px}
+.hemp{font-size:11px;color:var(--text3);text-align:center;padding:12px}
+
+/* ── MODAL ── */
+.mbd{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:500;align-items:center;justify-content:center}
+.mbd.on{display:flex}
+.mbox{background:#fff;border-radius:var(--rxl);padding:24px;width:420px;border:1px solid var(--border);box-shadow:0 8px 32px rgba(0,0,0,.15);max-height:90vh;overflow-y:auto}
+.mbox h3{font-size:16px;font-weight:700;margin-bottom:16px;color:var(--text)}
+.mrow{margin-bottom:14px}
+.mrow label{font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px}
+.minp{width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:var(--r);font-family:var(--f);font-size:12px;color:var(--text);outline:none;transition:border-color .2s}
+.minp:focus{border-color:var(--blue)}
+.msel{width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:var(--r);font-family:var(--f);font-size:12px;color:var(--text);background:#fff;outline:none}
+.type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:4px}
+.topt{border:1px solid var(--border);border-radius:var(--r);padding:7px 6px;text-align:center;cursor:pointer;font-size:11px;font-weight:600;transition:all .15s;background:#fff}
+.topt:hover{border-color:var(--blue);background:var(--blue-l)}
+.topt.sel{border-color:var(--blue);background:var(--blue);color:#fff}
+.mdays-calc{margin-top:8px;padding:8px 10px;background:var(--blue-l);border-radius:var(--r);font-size:11px;color:var(--blue);border:1px solid var(--blue-m)}
+.members-add{display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto}
+.madd-row{display:flex;gap:6px;align-items:center}
+.madd-row .minp{flex:2}
+.madd-row .msel{flex:1}
+.madd-row .rm{padding:6px 9px;background:var(--red-l);color:var(--red);border:1px solid #FECACA;border-radius:var(--r);cursor:pointer;font-size:12px;font-family:var(--f)}
+.madd-row .rm:hover{background:#FEE2E2}
+.add-row-btn{font-size:11px;padding:6px 12px;border:1.5px dashed var(--border2);border-radius:var(--r);background:transparent;color:var(--text3);cursor:pointer;font-family:var(--f);transition:all .15s;width:100%;text-align:center}
+.add-row-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-l)}
+.mbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+.mb{font-size:12px;padding:8px 18px;border-radius:var(--r);border:1px solid var(--border);background:#fff;color:var(--text);cursor:pointer;font-family:var(--f);font-weight:500}
+.mb:hover{background:var(--slate-l)}
+.mb.ok{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:600}
+.mb.ok:hover{background:var(--navy2)}
+.mb.danger{background:var(--red);color:#fff;border-color:var(--red)}
+
+/* ── SAVES PAGE ── */
+.sform{background:#fff;border:1px solid var(--border);border-radius:var(--rl);padding:14px;margin-bottom:14px;display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap}
+.sform label{font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px}
+.sform input{padding:7px 11px;border:1px solid var(--border);border-radius:var(--r);font-family:var(--f);font-size:12px;color:var(--text);outline:none;width:220px}
+.sform input:focus{border-color:var(--blue)}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.scard{background:#fff;border:1px solid var(--border);border-radius:var(--rl);padding:14px;display:flex;flex-direction:column;gap:8px}
+.scard h3{font-size:13px;font-weight:600}
+.scard .sm{font-size:11px;color:var(--text3)}
+.scard .sa2{display:flex;gap:6px}
+.scb{font-size:11px;padding:5px 12px;border-radius:var(--r);border:1px solid var(--border);background:#fff;color:var(--text);cursor:pointer;font-family:var(--f)}
+.scb.ld{background:var(--navy);color:#fff;border-color:var(--navy)}
+.scb.dl{color:var(--red);border-color:#FECACA}
+.nosave{text-align:center;padding:40px;color:var(--text3)}
+
+/* ── ANALYTICS ── */
+.agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px;margin-bottom:14px}
+.acard{background:#fff;border:1px solid var(--border);border-radius:var(--rl);padding:14px}
+.albl{font-size:11px;color:var(--text3);margin-bottom:5px}
+.aval{font-size:26px;font-weight:700;color:var(--text)}
+.asub{font-size:10px;color:var(--text3);margin-top:2px}
+.arow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.ablk{background:#fff;border:1px solid var(--border);border-radius:var(--rl);padding:14px}
+.ablk h3{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.br{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.br:last-child{margin-bottom:0}
+.brl{font-size:11px;color:var(--text);width:110px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brt{flex:1;height:7px;background:var(--border);border-radius:4px;overflow:hidden}
+.brf{height:100%;border-radius:4px;transition:width .5s ease}
+.brn{font-size:11px;color:var(--text3);width:22px;text-align:right;font-weight:600}
+.atable{width:100%;border-collapse:collapse}
+.atable th,.atable td{padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);font-size:11px}
+.atable th{color:var(--text3);font-weight:600}
+.atable tr:last-child td{border-bottom:none}
+
+/* ── TOAST ── */
+.tbox{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:9999;pointer-events:none}
+.toast{background:var(--navy);color:#fff;font-size:12px;padding:8px 20px;border-radius:20px;opacity:0;transition:opacity .2s;white-space:nowrap;font-weight:500}
+.toast.on{opacity:1}
+
+@media print{.hdr,.btop,.leg,.abar,.side,#login,.nav,.hbtns,.cluster-btns,.tl-del,.cbtn,.add-member-btn{display:none!important}body{background:#fff}.blayout{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="lbox">
+    <div class="llogo">TD</div>
+    <h1>Team Distribution</h1>
+    <small>Sign in to manage your team</small>
+    <input class="linp" id="lu" type="text" placeholder="Username" autocomplete="off">
+    <input class="linp" id="lp" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="lbtn" onclick="doLogin()">Sign in</button>
+    <div class="lerr" id="lerr">Invalid credentials</div>
+    <div class="lhint">admin / team2024 &nbsp;·&nbsp; manager / dist2024</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="hdr">
+    <div class="brand">TD Team Manager <em>v3</em></div>
+    <div class="nav">
+      <button class="ntab on" onclick="showPg('board',this)">Board</button>
+      <button class="ntab" onclick="showPg('saves',this)">Saves</button>
+      <button class="ntab" onclick="showPg('analytics',this)">Analytics</button>
+    </div>
+    <div class="hbtns">
+      <button class="hb" onclick="window.print()">Print</button>
+      <button class="hb" onclick="doExport()">Export TXT</button><button class="hb" onclick="exportExcel()">Export Excel</button>
+      <button class="hb prim" onclick="quickSave()">Save Layout</button>
+      <button class="hb" onclick="doLogout()">Sign out</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- BOARD -->
+    <div class="pg on" id="pg-board">
+      <div class="btop">
+        <h2>Team Distribution Board <span style="font-size:11px;font-weight:400;color:var(--text3)">Click any card for options · Drag to swap</span></h2>
+        <input class="sinp" type="text" placeholder="Search name..." oninput="doSearch(this.value)">
+        <button class="tb" id="ubtn" onclick="doUndo()" disabled>&#8629; Undo</button>
+        <button class="tb acc" onclick="quickSave()">Save</button>
+        <button class="tb grn" onclick="window.print()">Print</button>
+      </div>
+      <div class="leg">
+        <div class="li"><div class="ld" style="background:#2563EB"></div>Cluster Engineer</div>
+        <div class="li"><div class="ld" style="background:#7C3AED"></div>Expert / Lead Tech</div>
+        <div class="li"><div class="ld" style="background:#0D9488"></div>Technician</div>
+        <div class="li"><div class="ld" style="background:#D97706"></div>Driver</div>
+        <div class="li"><div class="ld" style="background:#475569"></div>Support</div>
+        <div class="ls"></div>
+        <div class="li"><div class="lb" style="border:1.5px solid #7C3AED;background:#EDE9FE"></div>AVS member</div>
+        <div class="li"><div class="lb" style="border:1.5px solid #D97706;background:#FEF3C7"></div>Sub Team</div>
+      </div>
+      <div class="abar">
+        <span class="al">Accommodation:</span>
+        <span class="ap" style="background:#DBEAFE;color:#1D4ED8">HAZ</span><span class="ad">Hor Al Anz</span>
+        <span class="ap" style="background:#DCFCE7;color:#15803D">RAK</span><span class="ad">Ras Al Khor</span>
+        <span class="ap" style="background:#FEF3C7;color:#92400E">AKG</span><span class="ad">Al Kail Gate</span>
+        <span class="ap" style="background:#EDE9FE;color:#6D28D9">SHJ</span><span class="ad">Sharjah</span>
+        <span class="ap" style="background:#FCE7F3;color:#9D174D">PER</span><span class="ad">Personal</span>
+        <span class="ap" style="background:#FFEDD5;color:#C2410C">DIP</span><span class="ad">DIP</span>
+      </div>
+      <div class="blayout">
+        <div id="sections"></div>
+        <div class="side">
+          <div class="panel">
+            <div class="phdr" style="background:#475569"><h4>Unassigned pool</h4><span class="pc" id="pcnt">0</span></div>
+            <div class="pbody">
+              <div class="dz" id="pdrop">Drop here to unassign</div>
+              <div class="pchips" id="pchips"></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="phdr" style="background:#334155"><h4>Move history</h4><span class="pc" id="hcnt">0</span></div>
+            <div class="pbody"><div class="hlist" id="hlist"><span class="hemp">No moves yet</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SAVES -->
+    <div class="pg" id="pg-saves">
+      <div class="btop"><h2>Saved layouts</h2><button class="tb" id="dupBtn" onclick="duplicatePlan()">Duplicate current plan</button><button class="tb grn" id="xlsBtn" onclick="exportExcel()">Export Excel</button></div>
+      <div class="sform">
+        <div><label>Layout name</label><input type="text" id="sni" placeholder="e.g. Week 14 Plan" onkeydown="if(event.key==='Enter')doSave()"></div>
+        <button class="tb acc" onclick="doSave()">Save current layout</button>
+      </div>
+      <div id="sgrid"></div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div class="pg" id="pg-analytics">
+      <div class="btop"><h2>Analytics</h2><button class="tb" onclick="renderAnalytics()">Refresh</button></div>
+      <div id="acontent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="mbd" id="mbd">
+  <div class="mbox" id="mbox"></div>
+</div>
+
+<div class="tbox"><div class="toast" id="toast"></div></div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────
+const USERS={admin:'team2024',manager:'dist2024',supervisor:'super2024'};
+const AC={HAZ:['#DBEAFE','#1D4ED8'],RAK:['#DCFCE7','#15803D'],AKG:['#FEF3C7','#92400E'],SHJ:['#EDE9FE','#6D28D9'],PER:['#FCE7F3','#9D174D'],DIP:['#FFEDD5','#C2410C']};
+const RC={'Cluster Engineer':'#2563EB','Cluster Lead':'#2563EB','Expert':'#7C3AED','Lead Tech':'#7C3AED','Technician':'#0D9488','Helper':'#0D9488','Sub Team':'#D97706','Driver':'#D97706','Back Office':'#475569','QC':'#475569','Planning':'#475569'};
+const AVS=new Set(['Jerry','Sateesh B','Nayanur','Zino','Vishnu Thambi','Hein','Joy']);
+const ROLES=['Cluster Engineer','Expert','Lead Tech','Technician','Helper','Sub Team','Driver','Back Office','QC','Planning'];
+const WORK_TYPES=[
+  {key:'PPM',label:'PPM Team',color:'#2563EB',bg:'#EFF6FF'},
+  {key:'CALLOUT',label:'Callout',color:'#7C3AED',bg:'#EDE9FE'},
+  {key:'WORKORDER',label:'Work Orders',color:'#0D9488',bg:'#CCFBF1'},
+  {key:'ENQUIRY',label:'Enquiry',color:'#D97706',bg:'#FEF3C7'},
+  {key:'NIGHT',label:'Night Team',color:'#1E293B',bg:'#F1F5F9'},
+  {key:'DAY',label:'Day Team',color:'#16A34A',bg:'#DCFCE7'},
+  {key:'GENERAL',label:'General',color:'#475569',bg:'#F1F5F9'},
+];
+const PPM_DAYS_PER_TEAM=75;// 1 PPM team = 75 man days (fixed rule)
+
+// ── INITIAL DATA ──────────────────────────────────────────────────────
+// Structure: sections > clusters > teams (lines) > members (cards)
+// Each team line has: id, type, manDays, members[]
+function makeId(){return 't'+Date.now()+Math.random().toString(36).slice(2,6);}
+
+const INIT_SECS=[
+  {id:'kidar',label:'Kidar Muhammed',color:'#2563EB',clusters:[
+    {id:'cl1',name:'Northern Emirates — Wasil',manDays:85,teams:[
+      {id:'tl1',type:'PPM',manDays:85,members:[
+        {id:'s1',role:'Cluster Engineer',name:'Wasil',accom:[]},
+        {id:'s2',role:'Lead Tech',name:'Sandeep',accom:['HAZ','PER']},
+        {id:'s3',role:'Technician',name:'Lijin',accom:[]},
+        {id:'s4',role:'Planning',name:'Rahim',accom:[]},
+      ]}
+    ]},
+    {id:'cl2',name:'Deira & Karama',manDays:90,teams:[
+      {id:'tl5',type:'PPM',manDays:45,members:[
+        {id:'s5',role:'Cluster Engineer',name:'Sonu Roy',accom:[]},
+        {id:'s6',role:'Lead Tech',name:'Jerin',accom:['SHJ']},
+        {id:'s7',role:'Technician',name:'Anshad',accom:['SHJ']},
+      ]},
+      {id:'tl6',type:'CALLOUT',manDays:45,members:[
+        {id:'s8',role:'Lead Tech',name:'Sinu Cletus',accom:['SHJ']},
+        {id:'s9',role:'Sub Team',name:'Prasanth S',accom:['SHJ']},
+      ]},
+    ]},
+    {id:'cl3',name:'Dubai Land — Bilal',manDays:195,teams:[
+      {id:'tl10',type:'PPM',manDays:75,members:[
+        {id:'s10',role:'Cluster Engineer',name:'Bilal',accom:[]},
+        {id:'s11',role:'Expert',name:'Jalendhar',accom:['PER']},
+        {id:'s12',role:'Lead Tech',name:'Mozzam Ali',accom:['RAK','PER']},
+        {id:'s13',role:'Technician',name:'Jawad',accom:['SHJ']},
+      ]},
+      {id:'tl11',type:'PPM',manDays:75,members:[
+        {id:'s14',role:'Lead Tech',name:'Kumar',accom:['HAZ']},
+        {id:'s15',role:'Technician',name:'Mohinuddin',accom:['HAZ']},
+      ]},
+      {id:'tl12',type:'CALLOUT',manDays:45,members:[
+        {id:'s16',role:'Sub Team',name:'Ramjan',accom:['RAK']},
+        {id:'s17',role:'Driver',name:'M. Junaid',accom:['PER']},
+      ]},
+    ]},
+    {id:'cl4',name:'Down Town & Al Quoz — Kidar',manDays:145,teams:[
+      {id:'tl18',type:'PPM',manDays:72,members:[
+        {id:'s18',role:'Cluster Engineer',name:'Kidar',accom:[]},
+        {id:'s19',role:'Lead Tech',name:'Danish',accom:['PER']},
+        {id:'s20',role:'Lead Tech',name:'Amir',accom:['PER']},
+        {id:'s23',role:'Technician',name:'Vishnu J',accom:['PER']},
+        {id:'s24',role:'Technician',name:'Saddam',accom:['RAK']},
+      ]},
+      {id:'tl19',type:'PPM',manDays:73,members:[
+        {id:'s21',role:'Lead Tech',name:'Aman',accom:['AKG']},
+        {id:'s22',role:'Lead Tech',name:'Sajid',accom:['PER']},
+        {id:'s25',role:'Technician',name:'Ripon',accom:['RAK']},
+        {id:'s26',role:'Sub Team',name:'Al Amin',accom:['RAK']},
+        {id:'s27',role:'Sub Team',name:'Ali Akbar',accom:['RAK']},
+      ]},
+    ]},
+    {id:'cl5',name:'RTA — Mary',manDays:50,teams:[
+      {id:'tl28',type:'PPM',manDays:50,members:[
+        {id:'s28',role:'Cluster Engineer',name:'Mary',accom:[]},
+        {id:'s29',role:'Lead Tech',name:'Yusuf',accom:['AKG']},
+        {id:'s30',role:'Technician',name:'Syam',accom:['SHJ']},
+        {id:'s31',role:'Technician',name:'Mustafa',accom:['SHJ']},
+        {id:'s32',role:'Technician',name:'Rejeev',accom:['SHJ']},
+        {id:'s33',role:'Driver',name:'Abraham',accom:['SHJ','PER']},
+      ]},
+    ]},
+  ]},
+  {id:'binu',label:'Binu Baby',color:'#0D9488',clusters:[
+    {id:'cl6',name:'Marina & Night — Cibin',manDays:44,teams:[
+      {id:'tl34',type:'NIGHT',manDays:44,members:[
+        {id:'s34',role:'Cluster Engineer',name:'Cibin',accom:[]},
+        {id:'s35',role:'Lead Tech',name:'Stemin Raj',accom:['SHJ','PER']},
+        {id:'s36',role:'Sub Team',name:'Razi Ahamed',accom:['RAK']},
+      ]},
+    ]},
+    {id:'cl7',name:'Day & Night Rotation',manDays:86,teams:[
+      {id:'tl37',type:'DAY',manDays:43,members:[
+        {id:'s37',role:'Expert',name:'Sathish S',accom:['AKG']},
+        {id:'s39',role:'Technician',name:'Rahul',accom:['AKG']},
+        {id:'s41',role:'Lead Tech',name:'Sadhiq',accom:[]},
+        {id:'s43',role:'Planning',name:'Joy',accom:['SHJ']},
+      ]},
+      {id:'tl38',type:'NIGHT',manDays:43,members:[
+        {id:'s38',role:'Expert',name:'M. Niaz',accom:[]},
+        {id:'s40',role:'Technician',name:'Zahid Ali',accom:['SHJ']},
+        {id:'s42',role:'Driver',name:'Prashanth Y',accom:['HAZ']},
+      ]},
+    ]},
+    {id:'cl8',name:'Palm Jumeirah — Bilal S',manDays:160,teams:[
+      {id:'tl44',type:'PPM',manDays:80,members:[
+        {id:'s44',role:'Cluster Engineer',name:'Bilal S',accom:[]},
+        {id:'s45',role:'Expert',name:'Uvaiz',accom:['AKG']},
+        {id:'s46',role:'Lead Tech',name:'Subin G',accom:[]},
+        {id:'s48',role:'Technician',name:'Prajith',accom:[]},
+        {id:'s50',role:'Sub Team',name:'Golam',accom:['RAK']},
+      ]},
+      {id:'tl45',type:'PPM',manDays:80,members:[
+        {id:'s47',role:'Lead Tech',name:'Zeeshan',accom:['AKG']},
+        {id:'s49',role:'Technician',name:'Mallesh',accom:['SHJ']},
+        {id:'s51',role:'Sub Team',name:'MD Afridi',accom:['SHJ']},
+        {id:'s52',role:'Driver',name:'Shahin',accom:['PER']},
+      ]},
+    ]},
+    {id:'cl9',name:'Nshama & MC — Finny',manDays:120,teams:[
+      {id:'tl53',type:'PPM',manDays:60,members:[
+        {id:'s53',role:'Cluster Engineer',name:'Finny',accom:[]},
+        {id:'s54',role:'Expert',name:'Joyis',accom:[]},
+        {id:'s56',role:'Technician',name:'Stijin',accom:['AKG']},
+        {id:'s57',role:'Driver',name:'Adith',accom:['PER']},
+      ]},
+      {id:'tl54',type:'CALLOUT',manDays:60,members:[
+        {id:'s55',role:'Expert',name:'Sam Mathew',accom:[]},
+        {id:'s58',role:'Driver',name:'Prakesh',accom:['PER']},
+        {id:'s59',role:'Planning',name:'Hein',accom:[]},
+      ]},
+    ]},
+    {id:'cl10',name:'Dubai South — Sanju',manDays:85,teams:[
+      {id:'tl60',type:'PPM',manDays:85,members:[
+        {id:'s60',role:'Cluster Engineer',name:'Sanju',accom:[]},
+        {id:'s61',role:'Expert',name:'Aravind',accom:['AKG']},
+        {id:'s62',role:'Technician',name:'Rauz',accom:[]},
+        {id:'s63',role:'Sub Team',name:'Haanif',accom:['DIP']},
+        {id:'s64',role:'Driver',name:'MD Thowhidul',accom:['SHJ','PER']},
+        {id:'s65',role:'Planning',name:'Ajo Alex',accom:['AKG']},
+      ]},
+    ]},
+  ]},
+  {id:'av',label:'AV & Automation — Zino',color:'#7C3AED',clusters:[
+    {id:'cl11',name:'AV Section',manDays:0,teams:[
+      {id:'tl66',type:'GENERAL',manDays:0,members:[
+        {id:'s66',role:'Cluster Engineer',name:'Zino',accom:[]},
+        {id:'s67',role:'Expert',name:'Jerry',accom:[]},
+        {id:'s68',role:'Lead Tech',name:'Sateesh B',accom:['AKG']},
+        {id:'s69',role:'Planning',name:'Nayanur',accom:['HAZ']},
+      ]},
+    ]},
+  ]},
+  {id:'autodoor',label:'Auto Door — Saiju',color:'#D97706',clusters:[
+    {id:'cl12',name:'Auto Door Team',manDays:0,teams:[
+      {id:'tl70',type:'GENERAL',manDays:0,members:[
+        {id:'s70',role:'Cluster Engineer',name:'Saiju',accom:[]},
+        {id:'s71',role:'Expert',name:'Ajo Achankunju',accom:['SHJ']},
+        {id:'s72',role:'Lead Tech',name:'Kishan',accom:['SHJ']},
+        {id:'s73',role:'Lead Tech',name:'Manoj K',accom:['SHJ']},
+        {id:'s74',role:'Lead Tech',name:'Ajish',accom:['SHJ']},
+        {id:'s75',role:'Back Office',name:'Sam',accom:['PER']},
+        {id:'s76',role:'QC',name:'Viji',accom:[]},
+        {id:'s77',role:'Driver',name:'Mathew Joseph',accom:['PER','SHJ']},
+        {id:'s78',role:'Driver',name:'Vibin',accom:['SHJ','PER']},
+      ]},
+    ]},
+  ]},
+  {id:'project',label:'Project — Anzar',color:'#BE185D',clusters:[
+    {id:'cl13',name:'Project Core',manDays:0,teams:[
+      {id:'tl79',type:'GENERAL',manDays:0,members:[
+        {id:'s79',role:'Cluster Engineer',name:'Anzar',accom:[]},
+        {id:'s80',role:'Expert',name:'Imran',accom:['PER']},
+        {id:'s81',role:'Expert',name:'Nishant',accom:['PER']},
+        {id:'s82',role:'Expert',name:'Riyaz',accom:['PER']},
+        {id:'s83',role:'Lead Tech',name:'Annanuddin',accom:['RAK']},
+        {id:'s84',role:'Lead Tech',name:'Ansar KP',accom:['AKG']},
+        {id:'s85',role:'Lead Tech',name:'Bince P.S',accom:['PER']},
+        {id:'s86',role:'Back Office',name:'Sanu Thomas',accom:[]},
+      ]},
+    ]},
+    {id:'cl14',name:'Project Sub & Drivers',manDays:0,teams:[
+      {id:'tl96',type:'GENERAL',manDays:0,members:[
+        {id:'s96',role:'Sub Team',name:'Kabir',accom:['HAZ']},
+        {id:'s97',role:'Sub Team',name:'Mizan',accom:['HAZ']},
+        {id:'s98',role:'Sub Team',name:'Noor Islam',accom:['HAZ']},
+        {id:'s99',role:'Sub Team',name:'Sha Alam',accom:['RAK']},
+        {id:'s100',role:'Sub Team',name:'Sohag',accom:['RAK']},
+        {id:'s101',role:'Sub Team',name:'Shamim',accom:['HAZ']},
+        {id:'s102',role:'Sub Team',name:'Mohd Zilani',accom:['RAK']},
+        {id:'s103',role:'Sub Team',name:'MD Anas',accom:['HAZ']},
+        {id:'s104',role:'Driver',name:'Sarwar',accom:['HAZ']},
+        {id:'s105',role:'Driver',name:'Mossam Billa',accom:['RAK']},
+        {id:'s106',role:'Driver',name:'Imtaz',accom:['HAZ']},
+        {id:'s107',role:'Driver',name:'Imam',accom:['HAZ']},
+      ]},
+    ]},
+  ]},
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────
+let SECS=[], pool=[], hist=[], drag=null, dragFrom=null, collapsed={}, CU=null;
+var _wasDragging=false;
+
+function init(){
+  const sv=localStorage.getItem('tdm3_state');
+  if(sv){const d=JSON.parse(sv);SECS=d.secs;pool=d.pool||[];}
+  else{SECS=JSON.parse(JSON.stringify(INIT_SECS));pool=[];}
+}
+function persist(){localStorage.setItem('tdm3_state',JSON.stringify({secs:SECS,pool}));}
+
+// ── HELPERS ───────────────────────────────────────────────────────────
+function wtInfo(key){return WORK_TYPES.find(w=>w.key===key)||WORK_TYPES[WORK_TYPES.length-1];}
+function acHTML(arr){return(arr||[]).map(a=>`<span class="ap" style="background:${AC[a][0]};color:${AC[a][1]}">${a}</span>`).join('');}
+function cardCls(m){let c='card';if(AVS.has(m.name))c+=' avs';else if(m.role==='Sub Team')c+=' sub';return c;}
+function chipCls(m){let c='pchip';if(AVS.has(m.name))c+=' avs';else if(m.role==='Sub Team')c+=' sub';return c;}
+function roleGroup(r){if(['Cluster Engineer','Cluster Lead'].includes(r))return 0;if(['Expert','Lead Tech'].includes(r))return 1;if(['Technician','Helper'].includes(r))return 2;if(r==='Sub Team')return 3;if(r==='Driver')return 4;return 5;}
+function isPPMTeam(tl){return tl.type==='PPM';}
+function ppmTeamsOnly(cl){return cl.teams.filter(isPPMTeam);}
+function nonPPMTeams(cl){return cl.teams.filter(t=>!isPPMTeam(t));}
+function totalPPMDays(cl){return ppmTeamsOnly(cl).reduce((a,t)=>a+(parseInt(t.manDays)||0),0);}
+function totalClusterDays(cl){return cl.teams.reduce((a,t)=>a+(parseInt(t.manDays)||0),0);}
+function totalClusterMembers(cl){return cl.teams.reduce((a,t)=>a+t.members.length,0);}
+// Roles excluded from PPM day count: Cluster Engineer, Cluster Lead, Lead Tech, Expert
+function isPPMWorker(m){return m.role!=='Cluster Engineer'&&m.role!=='Cluster Lead'&&m.role!=='Lead Tech'&&m.role!=='Expert';}
+// Count of Technicians/Helpers/Drivers/Sub Team (PPM-eligible) in a team line
+function ppmWorkerCount(tl){return tl.members.filter(isPPMWorker).length;}
+// Members with excluded roles placed inside a PPM team (warning)
+function ppmWarningMembers(tl){return tl.members.filter(m=>!isPPMWorker(m)&&m.role!=='—');}
+
+// ── AUTH ─────────────────────────────────────────────────────────────
+function doLogin(){
+  const u=document.getElementById('lu').value.trim(),p=document.getElementById('lp').value;
+  if(USERS[u]===p){CU=u;document.getElementById('login').style.display='none';document.getElementById('app').style.display='flex';init();render();toast('Welcome, '+u);}
+  else document.getElementById('lerr').style.display='block';
+}
+function doLogout(){CU=null;document.getElementById('login').style.display='flex';document.getElementById('app').style.display='none';}
+
+// ── RENDER ────────────────────────────────────────────────────────────
+function licIcon(m){
+  if(m.licDriving) return '<span class="lic" style="color:#2563EB;font-size:13px" title="Driving licence">&#9904;</span>';
+  return '';
+}
+
+function cardHTML(m,tlId){
+  const col=RC[m.role]||'#888';
+  const cls=cardCls(m);
+  return '<div class="'+cls+'" data-id="'+m.id+'" data-tl="'+tlId+'" draggable="true">'+
+    '<div class="rdot" style="background:'+col+'"></div>'+
+    '<div class="crole">'+m.role+'</div>'+
+    '<div class="cname2">'+m.name+'</div>'+
+    (m.accom&&m.accom.length?'<div class="caccom">'+acHTML(m.accom)+'</div>':'')+
+    licIcon(m)+
+    '</div>';
+}
+
+// Called after render() to bind all drag/click events via addEventListener
+function bindCards(){
+  document.querySelectorAll('.card[data-id]').forEach(function(el){
+    var mid=el.dataset.id;
+    var tlId=el.dataset.tl;
+    // Remove old listeners by cloning
+    var fresh=el.cloneNode(true);
+    el.parentNode.replaceChild(fresh,el);
+    fresh.addEventListener('dragstart',function(e){
+      drag=mid; dragFrom='slot'; _wasDragging=false;
+      e.dataTransfer.effectAllowed='move';
+      setTimeout(function(){ _wasDragging=true; fresh.classList.add('dragging'); },0);
+    });
+    fresh.addEventListener('dragend',function(){
+      fresh.classList.remove('dragging','drag-over');
+      drag=null; dragFrom=null;
+      setTimeout(function(){ _wasDragging=false; },80);
+    });
+    fresh.addEventListener('dragover',function(e){
+      e.preventDefault(); e.stopPropagation();
+      fresh.classList.add('drag-over');
+    });
+    fresh.addEventListener('dragleave',function(e){
+      fresh.classList.remove('drag-over');
+    });
+    fresh.addEventListener('drop',function(e){
+      e.preventDefault(); e.stopPropagation();
+      fresh.classList.remove('drag-over');
+      var src=drag; var srcFrom=dragFrom;
+      drag=null; dragFrom=null;
+      if(!src||src===mid) return;
+      if(srcFrom==='pool') poolToSlot(src,mid);
+      else swapMembers(src,mid);
+    });
+    fresh.addEventListener('click',function(e){
+      if(_wasDragging) return;
+      e.stopPropagation();
+      openCardMenu(e,mid,tlId);
+    });
+  });
+
+  // Bind pool chips
+  document.querySelectorAll('.pchip[data-pid]').forEach(function(el){
+    var pid=el.dataset.pid;
+    var fresh=el.cloneNode(true);
+    el.parentNode.replaceChild(fresh,el);
+    fresh.addEventListener('dragstart',function(e){
+      drag=pid; dragFrom='pool'; _wasDragging=false;
+      e.dataTransfer.effectAllowed='move';
+      setTimeout(function(){ _wasDragging=true; fresh.classList.add('dragging'); },0);
+    });
+    fresh.addEventListener('dragend',function(){
+      fresh.classList.remove('dragging','drag-over');
+      drag=null; dragFrom=null;
+      setTimeout(function(){ _wasDragging=false; },80);
+    });
+    fresh.addEventListener('dragover',function(e){ e.preventDefault(); fresh.classList.add('drag-over'); });
+    fresh.addEventListener('dragleave',function(){ fresh.classList.remove('drag-over'); });
+    fresh.addEventListener('drop',function(e){ e.preventDefault(); fresh.classList.remove('drag-over'); });
+    fresh.addEventListener('click',function(e){
+      if(_wasDragging) return;
+      e.stopPropagation();
+      openPoolMenu(e,pid);
+    });
+  });
+
+  // Bind team row drop zones
+  document.querySelectorAll('.cards-row[data-tl]').forEach(function(el){
+    var tlId=el.dataset.tl;
+    el.addEventListener('dragover',function(e){
+      e.preventDefault();
+      el.style.background='#EFF6FF';
+    });
+    el.addEventListener('dragleave',function(){ el.style.background=''; });
+    el.addEventListener('drop',function(e){
+      e.preventDefault(); el.style.background='';
+      var src=drag; var srcFrom=dragFrom;
+      drag=null; dragFrom=null;
+      if(!src) return;
+      if(srcFrom==='pool') poolToTeam(src,tlId);
+      else moveToTeam(src,tlId);
+    });
+  });
+}
+
+function teamLineHTML(tl,secId,clId){
+  const wt=wtInfo(tl.type);
+  const isPPM=isPPMTeam(tl);
+  const workers=ppmWorkerCount(tl);
+  const warned=isPPM?ppmWarningMembers(tl):[];
+  const leadMember=tl.members.find(m=>m.role==='Cluster Engineer'||m.role==='Lead Tech'||m.role==='Expert')||tl.members[0];
+  let html=`<div class="team-line" data-tl="${tl.id}" style="border-left:3px solid ${isPPM?'#2563EB':wt.color}">
+    <div class="tl-meta">
+      <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+        <div class="tl-type" style="background:${wt.bg};color:${wt.color}">${wt.label}</div>
+        ${isPPM&&warned.length>0?`<span title="Warning: ${warned.map(m=>m.name+' ('+m.role+')').join(', ')} are Lead/Manager — excluded from PPM days" style="font-size:9px;color:#D97706;background:#FEF3C7;border-radius:4px;padding:1px 5px;font-weight:600;cursor:help">⚠ ${warned.length} excluded</span>`:''}
+        ${!isPPM?`<span style="font-size:9px;color:#7C3AED;background:#EDE9FE;border-radius:4px;padding:1px 5px;font-weight:600">Non-PPM</span>`:''}
+      </div>
+      ${isPPM?`<div class="tl-days">
+        <span style="font-size:9px;color:var(--text3)">PPM Days:</span>
+        <input type="number" value="${tl.manDays||0}" min="0"
+          onchange="updateManDays('${tl.id}',this.value)"
+          onclick="ev=>ev.stopPropagation()"
+          title="Man Days for this PPM team (manual entry)">
+      </div>`:''}
+      ${isPPM?`<div style="font-size:9px;color:#2563EB;margin-top:2px">
+        <strong>${workers}</strong> PPM worker${workers!==1?'s':''} · ${tl.members.length} total
+        ${warned.length>0?`<span style="color:#D97706"> (${warned.length} excl.)</span>`:''}
+      </div>`:`<div style="font-size:9px;color:#7C3AED;margin-top:2px">Callout / WO / Enquiry</div>`}
+      ${leadMember?`<div class="tl-name">Lead: ${leadMember.name}</div>`:''}
+    </div>
+    <div class="cards-row" data-tl="${tl.id}"
+      ondragover="ev=>{ev.preventDefault();ev.currentTarget.classList.add('over')}"
+      ondragleave="ev=>ev.currentTarget.classList.remove('over')"
+      ondrop="dropToRow(event,'${tl.id}')">`;
+
+  // Cards with role-group separators
+  tl.members.forEach((m,i)=>{
+    if(i>0&&roleGroup(tl.members[i-1].role)!==roleGroup(m.role)){
+      html+=`<div class="role-sep">›</div>`;
+    }
+    html+=cardHTML(m,tl.id);
+  });
+
+  // Add member button
+  html+=`<button class="add-member-btn" onclick="openAddMember('${secId}','${clId}','${tl.id}')">
+    <div class="plus">+</div>Add
+  </button>`;
+
+  html+=`</div>
+    <button class="tl-del" onclick="deleteTeamLine('${secId}','${clId}','${tl.id}')" title="Delete this team line">&#10005;</button>
+  </div>`;
+  return html;
+}
+
+function clusterHTML(cl,secId){
+  const ppmDays=totalPPMDays(cl);
+  const ppmTeamCount=ppmTeamsOnly(cl).length;
+  const nonPPMCount=nonPPMTeams(cl).length;
+  const totalMembers=totalClusterMembers(cl);
+
+  // count total PPM workers (excluding Cluster Engineer + Lead Tech + Expert) across all PPM teams
+  const totalPPMWorkers=ppmTeamsOnly(cl).reduce((a,t)=>a+ppmWorkerCount(t),0);
+  // count all warning members (excluded roles inside PPM teams)
+  const totalWarned=ppmTeamsOnly(cl).reduce((a,t)=>a+ppmWarningMembers(t).length,0);
+
+
+  let html=`<div class="cluster" id="cl-${cl.id}">
+    <div class="cluster-hdr">
+      <h4>${cl.name}${ppmDays>0?` <span style="font-size:10px;font-weight:500;color:#2563EB;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:5px;padding:1px 8px;margin-left:6px">${ppmDays} PPM Days</span>`:''}</h4>
+      <div class="cluster-stats">
+        <div class="cstat">Members: <strong>${totalMembers}</strong></div>
+        ${ppmTeamCount>0?`
+        <div class="cstat" style="border-color:#BFDBFE;background:#EFF6FF">PPM Teams: <strong style="color:#2563EB">${ppmTeamCount}</strong></div>
+        <div class="cstat" style="border-color:#BFDBFE;background:#EFF6FF">PPM Days: <strong style="color:#2563EB">${ppmDays}</strong></div>
+        <div class="cstat" style="border-color:#BFDBFE;background:#EFF6FF">PPM Workers: <strong style="color:#2563EB">${totalPPMWorkers}</strong> <span style="font-size:9px;color:#94A3B8">(excl. Lead/Mgr)</span></div>
+        ${totalWarned>0?`<div class="cstat" style="border-color:#FDE68A;background:#FEF3C7;color:#D97706">⚠ <strong>${totalWarned}</strong> Lead/Mgr in PPM team</div>`:''}`:''}
+        ${nonPPMCount>0?`<div class="cstat" style="border-color:#DDD6FE;background:#EDE9FE">Non-PPM: <strong style="color:#7C3AED">${nonPPMCount} team${nonPPMCount>1?'s':''}</strong></div>`:''}
+      </div>
+      <div class="cluster-btns">
+        <button class="cbtn" onclick="openAddTeam('${secId}','${cl.id}')">+ Add Team</button>
+      </div>
+    </div>`;
+
+  cl.teams.forEach(tl=>{html+=teamLineHTML(tl,secId,cl.id);});
+  html+=`</div>`;
+  return html;
+}
+
+function render(){
+  const sc=document.getElementById('sections');
+  sc.innerHTML='';
+  SECS.forEach(s=>{
+    const open=!collapsed[s.id];
+    const totalM=s.clusters.reduce((a,c)=>a+totalClusterMembers(c),0);
+    const div=document.createElement('div');div.className='section';
+    let body='';
+    s.clusters.forEach(cl=>{body+=clusterHTML(cl,s.id);});
+    div.innerHTML=`<div class="shdr" style="background:${s.color}" onclick="toggleSec('${s.id}')">
+      <h3>${s.label}</h3><span class="sc">${totalM} members</span><span class="sa">${open?'▲':'▼'}</span>
+    </div><div class="sbody" style="${open?'':'display:none'}">${body}</div>`;
+    sc.appendChild(div);
+  });
+  renderPool();renderHist();
+  document.getElementById('ubtn').disabled=hist.length===0;
+  setTimeout(bindCards,0);
+}
+
+function renderPool(){
+  const ch=document.getElementById('pchips');
+  document.getElementById('pcnt').textContent=pool.length;
+  ch.innerHTML=pool.map(p=>{
+    const licStr=p.licDriving?'<span style="color:#2563EB;margin-left:4px;font-size:13px">&#9904;</span>':'';
+    return '<div class="'+chipCls(p)+'" data-pid="'+p.pid+'" draggable="true">'+
+      '<div style="display:flex;align-items:center;justify-content:space-between">'+
+      '<div class="pn">'+p.name+'</div>'+licStr+'</div>'+
+      '<div class="pm">'+p.role+(p.accom&&p.accom.length?' · '+p.accom.join(' '):'')+
+      '</div></div>';
+  }).join('');
+}
+
+function renderHist(){
+  const hl=document.getElementById('hlist');
+  document.getElementById('hcnt').textContent=hist.length;
+  hl.innerHTML=hist.length?[...hist].reverse().map(h=>`<div class="hitem">${h.lbl}<span class="ht">${h.time} · ${h.user}</span></div>`).join(''):`<span class="hemp">No moves yet</span>`;
+}
+
+function toggleSec(id){collapsed[id]=!collapsed[id];render();}
+
+// ── FIND HELPERS ──────────────────────────────────────────────────────
+function findMember(id){
+  for(const s of SECS)for(const cl of s.clusters)for(const tl of cl.teams){
+    const i=tl.members.findIndex(m=>m.id===id);
+    if(i>=0)return{s,cl,tl,i,m:tl.members[i]};
+  }
+  return null;
+}
+function findTeamLine(tlId){
+  for(const s of SECS)for(const cl of s.clusters)for(const tl of cl.teams){
+    if(tl.id===tlId)return{s,cl,tl};
+  }
+  return null;
+}
+
+// ── DRAG & DROP ───────────────────────────────────────────────────────
+// ds/de kept for compatibility - bindCards handles card/chip drag
+function ds(e,id,from){
+  drag=id;dragFrom=from;
+}
+function de(){
+  document.querySelectorAll('.dragging,.drag-over').forEach(el=>el.classList.remove('dragging','drag-over'));
+  drag=null;dragFrom=null;
+}
+
+function dropCard(e,tid){
+  e.preventDefault();
+  e.currentTarget.classList.remove('over');
+  if(!drag||drag===tid)return;
+  if(dragFrom==='pool')poolToSlot(drag,tid);
+  else swapMembers(drag,tid);
+}
+
+function dropToRow(e,tlId){
+  e.preventDefault();e.currentTarget.classList.remove('over');
+  if(!drag)return;
+  if(dragFrom==='pool')poolToTeam(drag,tlId);
+  else moveToTeam(drag,tlId);
+}
+
+// Pool zone
+const pd=document.getElementById('pdrop');
+pd.ondragover=e=>{e.preventDefault();pd.classList.add('over')};
+pd.ondragleave=()=>pd.classList.remove('over');
+pd.ondrop=e=>{e.preventDefault();pd.classList.remove('over');if(drag&&dragFrom==='slot')toPool(drag);};
+
+// ── SWAP ─────────────────────────────────────────────────────────────
+function swapMembers(aid,bid){
+  const af=findMember(aid),bf=findMember(bid);
+  if(!af||!bf)return;
+  const am={...af.m},bm={...bf.m};
+  hist.push({lbl:`${am.name} ↔ ${bm.name}`,time:now(),user:CU,type:'swap',aid,bid,am,bm,aTl:af.tl.id,bTl:bf.tl.id,aI:af.i,bI:bf.i});
+  af.tl.members[af.i]={...bm,id:aid};
+  bf.tl.members[bf.i]={...am,id:bid};
+  persist();render();
+  setTimeout(()=>{
+    const ea=document.querySelector(`[data-id="${aid}"]`);
+    const eb=document.querySelector(`[data-id="${bid}"]`);
+    if(ea){ea.classList.add('pop-in');setTimeout(()=>ea.classList.remove('pop-in'),450);}
+    if(eb){eb.classList.add('pop-out');setTimeout(()=>eb.classList.remove('pop-out'),500);}
+  },20);
+  toast(`${am.name} ↔ ${bm.name}`);
+}
+
+// Move to different team line (drop on row bg)
+function moveToTeam(mid,tlId){
+  const mf=findMember(mid);const tf=findTeamLine(tlId);
+  if(!mf||!tf||mf.tl.id===tlId)return;
+  const m={...mf.m};
+  hist.push({lbl:`${m.name} → ${tf.tl.id} team`,time:now(),user:CU,type:'move',mid,fromTl:mf.tl.id,toTl:tlId,m,idx:mf.i});
+  mf.tl.members.splice(mf.i,1);
+  tf.tl.members.push({...m});
+  persist();render();
+  setTimeout(()=>{
+    const el=document.querySelector(`[data-id="${mid}"]`);
+    if(el){el.classList.add('pop-in');setTimeout(()=>el.classList.remove('pop-in'),450);}
+  },20);
+  toast(`${m.name} moved to team`);
+}
+
+// ── TO POOL ───────────────────────────────────────────────────────────
+function toPool(mid){
+  const mf=findMember(mid);if(!mf)return;
+  const m={...mf.m};const pid=mid+'_'+Date.now();
+  pool.push({...m,pid});
+  hist.push({lbl:`${m.name} → pool`,time:now(),user:CU,type:'toPool',mid,pid,tl:mf.tl.id,idx:mf.i,m});
+  // Animate then remove
+  const el=document.querySelector(`[data-id="${mid}"]`);
+  if(el){
+    el.classList.add('pop-out');
+    setTimeout(()=>{mf.tl.members.splice(mf.i,1);persist();render();},300);
+  } else {mf.tl.members.splice(mf.i,1);persist();render();}
+  toast(`${m.name} removed from team`);
+}
+
+// Pool to specific card slot (swap)
+function poolToSlot(pid,tid){
+  const pi=pool.find(p=>p.pid===pid);if(!pi)return;
+  const tf=findMember(tid);if(!tf)return;
+  const displaced={...tf.m};
+  hist.push({lbl:`${pi.name} ↔ ${displaced.name} (from pool)`,time:now(),user:CU,type:'fromPool',pid,tid,pi:{...pi},displaced,tl:tf.tl.id,idx:tf.i});
+  pool=pool.filter(p=>p.pid!==pid);
+  const np=displaced.id+'_d_'+Date.now();
+  pool.push({...displaced,pid:np});
+  tf.tl.members[tf.i]={...pi,id:tid};
+  persist();render();
+  setTimeout(()=>{
+    const el=document.querySelector(`[data-id="${tid}"]`);
+    if(el){el.classList.add('pop-in');setTimeout(()=>el.classList.remove('pop-in'),450);}
+  },20);
+  toast(`${pi.name} placed — ${displaced.name} popped out`);
+}
+
+// Pool to team row (add to end)
+function poolToTeam(pid,tlId){
+  const pi=pool.find(p=>p.pid===pid);if(!pi)return;
+  const tf=findTeamLine(tlId);if(!tf)return;
+  const nid='s'+Date.now();
+  pool=pool.filter(p=>p.pid!==pid);
+  tf.tl.members.push({...pi,id:nid});
+  hist.push({lbl:`${pi.name} added to team`,time:now(),user:CU,type:'poolToTeam',pid,tlId,nid,pi:{...pi}});
+  persist();render();
+  setTimeout(()=>{
+    const el=document.querySelector(`[data-id="${nid}"]`);
+    if(el){el.classList.add('pop-in');setTimeout(()=>el.classList.remove('pop-in'),450);}
+  },20);
+  toast(`${pi.name} added to team`);
+}
+
+// ── MAN DAYS UPDATE ───────────────────────────────────────────────────
+function updateManDays(tlId,val){
+  const tf=findTeamLine(tlId);if(!tf)return;
+  tf.tl.manDays=parseInt(val)||0;
+  persist();
+  const clEl=document.getElementById('cl-'+tf.cl.id);
+  if(clEl){
+    const cl=tf.cl;
+    const ppmDays=totalPPMDays(cl);
+    const ppmTeamCount=ppmTeamsOnly(cl).length;
+    const nonPPMCount=nonPPMTeams(cl).length;
+    // Update heading badge — PPM days only
+    const h4=clEl.querySelector('h4');
+    if(h4){
+      const existing=h4.querySelector('span');if(existing)existing.remove();
+      if(ppmDays>0){
+        const badge=document.createElement('span');
+        badge.style.cssText='font-size:10px;font-weight:500;color:#2563EB;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:5px;padding:1px 8px;margin-left:6px';
+        badge.textContent=ppmDays+' PPM Days';
+        h4.appendChild(badge);
+      }
+    }
+    const stats=clEl.querySelector('.cluster-stats');
+    const totalPPMWorkers2=ppmTeamsOnly(cl).reduce((a,t)=>a+ppmWorkerCount(t),0);
+    const totalWarned2=ppmTeamsOnly(cl).reduce((a,t)=>a+ppmWarningMembers(t).length,0);
+    if(stats)stats.innerHTML=`
+      <div class="cstat">Members: <strong>${totalClusterMembers(cl)}</strong></div>
+      ${ppmTeamCount>0?`
+      <div class="cstat" style="border-color:#BFDBFE;background:#EFF6FF">PPM Teams: <strong style="color:#2563EB">${ppmTeamCount}</strong></div>
+      <div class="cstat" style="border-color:#BFDBFE;background:#EFF6FF">PPM Days: <strong style="color:#2563EB">${ppmDays}</strong></div>
+      <div class="cstat" style="border-color:#BFDBFE;background:#EFF6FF">PPM Workers: <strong style="color:#2563EB">${totalPPMWorkers2}</strong></div>
+      ${totalWarned2>0?`<div class="cstat" style="border-color:#FDE68A;background:#FEF3C7;color:#D97706">⚠ ${totalWarned2} Lead/Mgr in PPM</div>`:''}`:''}
+      ${nonPPMCount>0?`<div class="cstat" style="border-color:#DDD6FE;background:#EDE9FE">Non-PPM: <strong style="color:#7C3AED">${nonPPMCount}</strong></div>`:''}`;
+  }
+}
+
+
+// ── CARD CLICK MENU ──────────────────────────────────────────────────
+var _menu=null;
+function _closeMenu(){if(_menu){_menu.remove();_menu=null;}}
+document.addEventListener('click',_closeMenu);
+
+function _posMenu(menu,ev){
+  document.body.appendChild(menu);
+  var x=ev.clientX,y=ev.clientY;
+  if(y+400>window.innerHeight) y=Math.max(4,y-400);
+  if(x+230>window.innerWidth) x=window.innerWidth-234;
+  menu.style.top=y+'px';
+  menu.style.left=x+'px';
+  _menu=menu;
+}
+
+function _mkMenu(){
+  var m=document.createElement('div');
+  m.className='cmenu';
+  m.onclick=function(e){e.stopPropagation();};
+  return m;
+}
+
+function _mkSec(labelTxt){
+  var s=document.createElement('div');
+  s.className='cmenu-sec';
+  if(labelTxt){var l=document.createElement('div');l.className='cmenu-lbl';l.textContent=labelTxt;s.appendChild(l);}
+  return s;
+}
+
+function _mkItem(icon,label,isOn,cls,fn){
+  var d=document.createElement('div');
+  d.className='cmi'+(isOn?' on':'')+(cls?' '+cls:'');
+  d.innerHTML='<span class="ci">'+icon+'</span>'+label+(isOn?'<span class="ck">&#10003;</span>':'');
+  d.onclick=function(){_closeMenu();if(fn)fn();};
+  return d;
+}
+
+var ROLE_ICONS={'Cluster Engineer':'&#9733;','Cluster Lead':'&#9733;','Expert':'&#128269;','Lead Tech':'&#128295;','Technician':'&#9881;','Helper':'&#128296;','Sub Team':'&#128101;','Driver':'&#9875;','Back Office':'&#128203;','QC':'&#128202;','Planning':'&#128197;'};
+
+function openCardMenu(ev,mid,tlId){
+  ev.stopPropagation();
+  _closeMenu();
+  var mf=findMember(mid);if(!mf)return;
+  var m=mf.m;
+  var menu=_mkMenu();
+
+  // Header
+  var hdr=document.createElement('div');hdr.className='cmenu-hdr';
+  hdr.innerHTML='<div class="chn">'+m.name+'</div><div class="chr">'+m.role+' &middot; '+mf.cl.name+'</div>';
+  menu.appendChild(hdr);
+
+  // Role
+  var rs=_mkSec('Change role');
+  ROLES.forEach(function(r){
+    rs.appendChild(_mkItem(ROLE_ICONS[r]||'&#8226;',r,r===m.role,'',function(role){return function(){
+      var old=mf.m.role;mf.m.role=role;
+      hist.push({lbl:m.name+': '+old+' → '+role,time:now(),user:CU,type:'roleChange',mid:mid,old:old,newRole:role});
+      persist();render();toast(m.name+' → '+role);
+    };}(r)));
+  });
+  menu.appendChild(rs);
+
+  // Licence
+  var ls=_mkSec('Licence');
+  ls.appendChild(_mkItem('&#9875;','Driving licence',!!m.licDriving,'',function(){
+    var mf2=findMember(mid);if(!mf2)return;
+    mf2.m.licDriving=!mf2.m.licDriving;
+    hist.push({lbl:m.name+': driving lic '+(mf2.m.licDriving?'added':'removed'),time:now(),user:CU,type:'lic',mid:mid});
+    persist();render();toast(m.name+': driving '+(mf2.m.licDriving?'added':'removed'));
+  }));
+  menu.appendChild(ls);
+
+  // Accommodation
+  var as=_mkSec('Accommodation');
+  Object.keys(AC).forEach(function(k){
+    var has=(m.accom||[]).includes(k);
+    as.appendChild(_mkItem(k,k+' — '+['Hor Al Anz','Ras Al Khor','Al Kail Gate','Sharjah','Personal','DIP'][Object.keys(AC).indexOf(k)],has,'',function(code){return function(){
+      var mf2=findMember(mid);if(!mf2)return;
+      if(!mf2.m.accom)mf2.m.accom=[];
+      var ix=mf2.m.accom.indexOf(code);
+      if(ix>=0)mf2.m.accom.splice(ix,1);else mf2.m.accom.push(code);
+      persist();render();toast(m.name+': '+code+' '+(ix<0?'added':'removed'));
+    };}(k)));
+  });
+  menu.appendChild(as);
+
+  // Switch team
+  var sw=_mkSec('Move to');
+  sw.appendChild(_mkItem('&#8646;','Switch team or cluster',false,'',function(){openSwitchPanel(mid);}));
+  menu.appendChild(sw);
+
+  // Actions
+  var act=_mkSec('Actions');
+  act.appendChild(_mkItem('&#8659;','Move to unassigned pool',false,'',function(){toPool(mid);}));
+  act.appendChild(_mkItem('&#10005;','Remove from system',false,'danger',function(){
+    var mf2=findMember(mid);if(!mf2)return;
+    var nm=mf2.m.name;
+    showMod('Remove member','Remove '+nm+' entirely? Cannot be undone.',function(){
+      var mf3=findMember(mid);if(!mf3)return;
+      mf3.tl.members.splice(mf3.i,1);
+      hist.push({lbl:nm+' removed from system',time:now(),user:CU,type:'remove',mid:mid});
+      persist();render();toast(nm+' removed');
+    });
+  }));
+  menu.appendChild(act);
+
+  _posMenu(menu,ev);
+}
+
+function openPoolMenu(ev,pid){
+  ev.stopPropagation();
+  _closeMenu();
+  var p=pool.find(function(x){return x.pid===pid;});if(!p)return;
+  var menu=_mkMenu();
+
+  var hdr=document.createElement('div');hdr.className='cmenu-hdr';
+  hdr.innerHTML='<div class="chn">'+p.name+'</div><div class="chr">'+p.role+' &middot; Unassigned pool</div>';
+  menu.appendChild(hdr);
+
+  var rs=_mkSec('Change role');
+  ROLES.forEach(function(r){
+    rs.appendChild(_mkItem(ROLE_ICONS[r]||'&#8226;',r,r===p.role,'',function(role){return function(){
+      var pp=pool.find(function(x){return x.pid===pid;});if(!pp)return;
+      pp.role=role;persist();renderPool();toast(p.name+' → '+role);
+    };}(r)));
+  });
+  menu.appendChild(rs);
+
+  var ls=_mkSec('Licence');
+  ls.appendChild(_mkItem('&#9875;','Driving licence',!!p.licDriving,'',function(){
+    var pp=pool.find(function(x){return x.pid===pid;});if(!pp)return;
+    pp.licDriving=!pp.licDriving;persist();renderPool();toast(p.name+': driving '+(pp.licDriving?'added':'removed'));
+  }));
+  menu.appendChild(ls);
+
+  var as2=_mkSec('Assign to team');
+  as2.appendChild(_mkItem('&#8679;','Pick a team to join',false,'',function(){openAssignPanel(pid);}));
+  menu.appendChild(as2);
+
+  _posMenu(menu,ev);
+}
+
+// ── SWITCH TEAM MODAL ─────────────────────────────────────────────────
+function openSwitchPanel(mid){
+  var mf=findMember(mid);if(!mf)return;
+  var m=mf.m;
+  var inner='<h3>Move '+m.name+'</h3>';
+  inner+='<p style="font-size:12px;color:var(--text2);margin-bottom:10px">Now in: <strong>'+mf.cl.name+'</strong></p>';
+  inner+='<div class="sw-grid">';
+  SECS.forEach(function(s){
+    inner+='<div class="sw-sep">'+s.label+'</div>';
+    s.clusters.forEach(function(cl){
+      cl.teams.forEach(function(tl){
+        var isCur=(tl.id===mf.tl.id);
+        var wt=wtInfo(tl.type);
+        var lead=tl.members.find(function(x){return x.role==='Cluster Engineer'||x.role==='Lead Tech'||x.role==='Expert';});
+        var clk=isCur?'':' onclick="switchTo(\''+mid+'\',\''+tl.id+'\');closeMod()"';
+        inner+='<div class="sw-item'+(isCur?' cur':'')+'"'+clk+'>';
+        inner+='<div class="sw-cl">'+cl.name+'</div>';
+        if(lead)inner+='<div class="sw-ld">Lead: '+lead.name+'</div>';
+        inner+='<div style="display:flex;align-items:center;gap:4px;margin-top:3px">';
+        inner+='<span class="si-type ap" style="background:'+wt.bg+';color:'+wt.color+'">'+wt.label+'</span>';
+        inner+='<span style="font-size:9px;color:var(--text3)">'+tl.members.length+' members</span>';
+        if(isCur)inner+='<span style="font-size:9px;color:var(--blue);margin-left:4px">&#10003; current</span>';
+        inner+='</div></div>';
+      });
+    });
+  });
+  inner+='</div><div class="mbtns"><button class="mb" onclick="closeMod()">Cancel</button></div>';
+  document.getElementById('mbox').innerHTML=inner;
+  document.getElementById('mbd').classList.add('on');
+}
+
+function switchTo(mid,toTlId){
+  var mf=findMember(mid);if(!mf)return;
+  var tf=findTeamLine(toTlId);if(!tf)return;
+  if(mf.tl.id===toTlId)return;
+  var m=Object.assign({},mf.m);
+  hist.push({lbl:m.name+': '+mf.cl.name+' → '+tf.cl.name,time:now(),user:CU,type:'switch',mid:mid,fromTl:mf.tl.id,toTl:toTlId});
+  mf.tl.members.splice(mf.i,1);
+  tf.tl.members.push(m);
+  persist();render();
+  setTimeout(function(){var el=document.querySelector('[data-id="'+mid+'"]');if(el){el.classList.add('pop-in');setTimeout(function(){el.classList.remove('pop-in');},450);}},20);
+  toast(m.name+' → '+tf.cl.name);
+}
+
+function openAssignPanel(pid){
+  var p=pool.find(function(x){return x.pid===pid;});if(!p)return;
+  var inner='<h3>Assign '+p.name+' to a team</h3>';
+  inner+='<div class="sw-grid">';
+  SECS.forEach(function(s){
+    inner+='<div class="sw-sep">'+s.label+'</div>';
+    s.clusters.forEach(function(cl){
+      cl.teams.forEach(function(tl){
+        var wt=wtInfo(tl.type);
+        var lead=tl.members.find(function(x){return x.role==='Cluster Engineer'||x.role==='Lead Tech'||x.role==='Expert';});
+        inner+='<div class="sw-item" onclick="poolToTeam(\''+pid+'\',\''+tl.id+'\');closeMod()">';
+        inner+='<div class="sw-cl">'+cl.name+'</div>';
+        if(lead)inner+='<div class="sw-ld">Lead: '+lead.name+'</div>';
+        inner+='<div style="display:flex;align-items:center;gap:4px;margin-top:3px">';
+        inner+='<span class="ap" style="background:'+wt.bg+';color:'+wt.color+'">'+wt.label+'</span>';
+        inner+='<span style="font-size:9px;color:var(--text3)">'+tl.members.length+' members</span>';
+        inner+='</div></div>';
+      });
+    });
+  });
+  inner+='</div><div class="mbtns"><button class="mb" onclick="closeMod()">Cancel</button></div>';
+  document.getElementById('mbox').innerHTML=inner;
+  document.getElementById('mbd').classList.add('on');
+}
+
+// ── UNDO ─────────────────────────────────────────────────────────────
+function doUndo(){
+  if(!hist.length)return;
+  const h=hist.pop();
+  if(h.type==='swap'){
+    const af=findMember(h.aid),bf=findMember(h.bid);
+    if(af)af.tl.members[af.i]={...h.am,id:h.aid};
+    if(bf)bf.tl.members[bf.i]={...h.bm,id:h.bid};
+    toast(`Undone: ${h.am.name} ↔ ${h.bm.name}`);
+  } else if(h.type==='toPool'){
+    const tf=findTeamLine(h.tl);
+    if(tf){pool=pool.filter(p=>p.pid!==h.pid);tf.tl.members.splice(h.idx,0,{...h.m});}
+    toast(`Restored: ${h.m.name}`);
+  } else if(h.type==='fromPool'){
+    const tf=findMember(h.tid);
+    if(tf){pool=pool.filter(p=>!p.pid.startsWith(h.tid+'_d_'));pool.push({...h.pi});tf.tl.members[tf.i]={...h.displaced,id:h.tid};}
+    toast('Undone');
+  } else if(h.type==='move'){
+    const tf=findMember(h.mid);const fromTf=findTeamLine(h.fromTl);
+    if(tf&&fromTf){tf.tl.members=tf.tl.members.filter(m=>m.id!==h.mid);fromTf.tl.members.splice(h.idx,0,{...h.m});}
+    toast(`Undone: ${h.m.name} moved back`);
+  } else if(h.type==='roleChange'){
+    var mfu=findMember(h.mid);if(mfu)mfu.m.role=h.old;toast('Undone: role reverted');
+  } else if(h.type==='switch'){
+    var mfs=findMember(h.mid);var fromTf=findTeamLine(h.fromTl);
+    if(mfs&&fromTf){var mCopy=Object.assign({},mfs.m);mfs.tl.members.splice(mfs.i,1);fromTf.tl.members.push(mCopy);}
+    toast('Undone: switch reversed');
+  } else if(h.type==='addTeam'){
+    const sf=SECS.find(s=>s.id===h.secId);const cl=sf&&sf.clusters.find(c=>c.id===h.clId);
+    if(cl){cl.teams=cl.teams.filter(t=>t.id!==h.tlId);}
+    toast('Team line removed');
+  } else if(h.type==='delTeam'){
+    const sf=SECS.find(s=>s.id===h.secId);const cl=sf&&sf.clusters.find(c=>c.id===h.clId);
+    if(cl){cl.teams.splice(h.idx,0,h.tl);}
+    toast(`Team line restored`);
+  } else if(h.type==='addMember'){
+    const tf=findTeamLine(h.tlId);
+    if(tf){tf.tl.members=tf.tl.members.filter(m=>m.id!==h.mid);}
+    toast(`Removed: ${h.name}`);
+  }
+  persist();render();
+}
+
+// ── SEARCH ────────────────────────────────────────────────────────────
+function doSearch(q){
+  document.querySelectorAll('.card').forEach(el=>{
+    if(!q){el.classList.remove('lit','dim');return;}
+    const n=el.querySelector('.cname2');
+    const m=n&&n.textContent.toLowerCase().includes(q.toLowerCase());
+    el.classList.toggle('lit',!!m);el.classList.toggle('dim',!m);
+  });
+}
+
+// ── ADD TEAM MODAL ────────────────────────────────────────────────────
+let selType='PPM';
+function openAddTeam(secId,clId){
+  selType='PPM';
+  const sf=SECS.find(s=>s.id===secId);const cl=sf&&sf.clusters.find(c=>c.id===clId);
+  if(!cl)return;
+  const ppmDays=totalPPMDays(cl);
+
+  document.getElementById('mbox').innerHTML=`
+    <h3>Add Team Line — ${cl.name}</h3>
+    <div class="mrow">
+      <label>Work type</label>
+      <div class="type-grid" id="typeGrid">
+        ${WORK_TYPES.map(w=>`<div class="topt${w.key==='PPM'?' sel':''}" onclick="selWT(this,'${w.key}')" style="color:${w.color};border-color:${w.key==='PPM'?w.color:''}">
+          ${w.label}
+        </div>`).join('')}
+      </div>
+    </div>
+    <div class="mrow">
+      <label>Man Days for this team</label>
+      <input class="minp" type="number" id="newDays" placeholder="e.g. 75" min="0">
+      <div class="mdays-calc">
+        ${ppmDays>0?`Current PPM total: <strong>${ppmDays} days</strong> across <strong>${ppmTeamsOnly(cl).length}</strong> PPM team${ppmTeamsOnly(cl).length!==1?'s':''}.`:'No PPM teams yet in this cluster.'}
+        <br><span style="color:#7C3AED;font-size:10px">Cluster Engineer &amp; Lead Tech are excluded from PPM day counts. Non-PPM teams (Callout, WO, Enquiry) are not added to PPM total.</span>
+      </div>
+    </div>
+    <div class="mrow">
+      <label>Initial members (optional)</label>
+      <div class="members-add" id="membersAdd">
+        <div class="madd-row">
+          <input class="minp" placeholder="Name" list="nameList">
+          <select class="msel">${ROLES.map(r=>`<option>${r}</option>`).join('')}</select>
+          <button class="rm" onclick="this.parentElement.remove()">✕</button>
+        </div>
+      </div>
+      <datalist id="nameList">${pool.map(p=>`<option value="${p.name}">`).join('')}</datalist>
+      <button class="add-row-btn" onclick="addMemberRow()" style="margin-top:6px">+ Add another member</button>
+    </div>
+    <div class="mbtns">
+      <button class="mb" onclick="closeMod()">Cancel</button>
+      <button class="mb ok" onclick="confirmAddTeam('${secId}','${clId}')">Add Team Line</button>
+    </div>`;
+  document.getElementById('mbd').classList.add('on');
+}
+
+function selWT(el,key){
+  selType=key;
+  const wt=wtInfo(key);
+  document.querySelectorAll('.topt').forEach(t=>{
+    t.classList.remove('sel');
+    const k=t.getAttribute('onclick').match(/'([^']+)'\)/)[1];
+    const w=wtInfo(k);t.style.borderColor='';t.style.background='';t.style.color=w.color;
+  });
+  el.classList.add('sel');el.style.background=wt.color;el.style.color='#fff';el.style.borderColor=wt.color;
+}
+
+function addMemberRow(){
+  const rows=document.getElementById('membersAdd');
+  const div=document.createElement('div');div.className='madd-row';
+  div.innerHTML=`<input class="minp" placeholder="Name" list="nameList"><select class="msel">${ROLES.map(r=>`<option>${r}</option>`).join('')}</select><button class="rm" onclick="this.parentElement.remove()">✕</button>`;
+  rows.appendChild(div);
+}
+
+function confirmAddTeam(secId,clId){
+  const sf=SECS.find(s=>s.id===secId);const cl=sf&&sf.clusters.find(c=>c.id===clId);if(!cl)return;
+  const days=parseInt(document.getElementById('newDays').value)||0;
+  const rows=document.querySelectorAll('#membersAdd .madd-row');
+  const members=[];
+  rows.forEach(r=>{
+    const name=r.querySelector('input').value.trim();
+    const role=r.querySelector('select').value;
+    if(name){
+      const pid=pool.find(p=>p.name===name);
+      const accom=pid?pid.accom:[];
+      if(pid)pool=pool.filter(p=>p.pid!==pid.pid);
+      members.push({id:'s'+Date.now()+Math.random().toString(36).slice(2,5),role,name,accom});
+    }
+  });
+  const tlId=makeId();
+  const newTl={id:tlId,type:selType,manDays:days,members};
+  cl.teams.push(newTl);
+  hist.push({lbl:`Added ${wtInfo(selType).label} team to ${cl.name}`,time:now(),user:CU,type:'addTeam',secId,clId,tlId});
+  persist();render();closeMod();
+  toast(`Team line added to ${cl.name}`);
+}
+
+// ── ADD MEMBER MODAL ──────────────────────────────────────────────────
+function openAddMember(secId,clId,tlId){
+  const tf=findTeamLine(tlId);if(!tf)return;
+  const acRows=Object.entries(AC).map(function(e){
+    return '<label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:11px">'
+      +'<input type="checkbox" id="nac_'+e[0]+'">'
+      +'<span class="ap" style="background:'+e[1][0]+';color:'+e[1][1]+'">'+e[0]+'</span></label>';
+  }).join('');
+  const roleOpts=ROLES.map(function(r){return '<option>'+r+'</option>';}).join('');
+  const poolOpts=pool.map(function(p){return '<option value="'+p.name+'">';}).join('');
+  document.getElementById('mbox').innerHTML=
+    '<h3>Add Team Member</h3>'
+    +'<div class="mrow"><label>Name</label>'
+    +'<input class="minp" id="nName" placeholder="Type name or pick from pool" list="nList" autocomplete="off">'
+    +'<datalist id="nList">'+poolOpts+'</datalist></div>'
+    +'<div class="mrow"><label>Role</label><select class="msel" id="nRole">'+roleOpts+'</select></div>'
+    +'<div class="mrow"><label>Accommodation</label>'
+    +'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">'+acRows+'</div></div>'
+    +'<div class="mrow"><label>Licence</label>'
+    +'<div style="display:flex;gap:16px;margin-top:6px">'
+    +'<label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px"><input type="checkbox" id="nLicD"> <span style="color:#2563EB">&#9875;</span> Driving</label>'
+
+    +'</div></div>'
+    +'<div class="mbtns">'
+    +'<button class="mb" onclick="closeMod()">Cancel</button>'
+    +'<button class="mb ok" onclick="confirmAddMember(\''+tlId+'\')">Add Member</button>'
+    +'</div>';
+  document.getElementById('nName').addEventListener('input',function(){
+    var p=pool.find(function(x){return x.name.toLowerCase()===this.value.toLowerCase();},this);
+    if(p){
+      document.getElementById('nRole').value=p.role;
+      Object.keys(AC).forEach(function(k){var cb=document.getElementById('nac_'+k);if(cb)cb.checked=(p.accom||[]).includes(k);});
+      var ld=document.getElementById('nLicD');if(ld)ld.checked=!!p.licDriving;
+    }
+  });
+  document.getElementById('mbd').classList.add('on');
+}
+
+function confirmAddMember(tlId){
+  var name=document.getElementById('nName').value.trim();
+  if(!name){toast('Enter a name');return;}
+  var role=document.getElementById('nRole').value;
+  var accom=Object.keys(AC).filter(function(k){var cb=document.getElementById('nac_'+k);return cb&&cb.checked;});
+  var licDriving=!!(document.getElementById('nLicD')&&document.getElementById('nLicD').checked);
+  var tf=findTeamLine(tlId);if(!tf)return;
+  var mid='s'+Date.now();
+  var pi=pool.find(function(p){return p.name.toLowerCase()===name.toLowerCase();});
+  if(pi)pool=pool.filter(function(p){return p.pid!==pi.pid;});
+  tf.tl.members.push({id:mid,role:role,name:name,accom:accom,licDriving:licDriving});
+  hist.push({lbl:'Added '+name+' ('+role+')',time:now(),user:CU,type:'addMember',tlId:tlId,mid:mid,name:name});
+  persist();render();closeMod();
+  setTimeout(function(){var el=document.querySelector('[data-id="'+mid+'"]');if(el){el.classList.add('pop-in');setTimeout(function(){el.classList.remove('pop-in');},450);}},20);
+  toast(name+' added');
+}
+
+// ── DELETE TEAM LINE ──────────────────────────────────────────────────
+function deleteTeamLine(secId,clId,tlId){
+  const sf=SECS.find(s=>s.id===secId);const cl=sf&&sf.clusters.find(c=>c.id===clId);if(!cl)return;
+  const idx=cl.teams.findIndex(t=>t.id===tlId);if(idx<0)return;
+  const tl=cl.teams[idx];
+  if(tl.members.length>0){
+    document.getElementById('mbox').innerHTML=`
+      <h3>Delete team line?</h3>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6">This team has <strong>${tl.members.length}</strong> members. They will be moved to the Unassigned Pool.</p>
+      <div class="mbtns">
+        <button class="mb" onclick="closeMod()">Cancel</button>
+        <button class="mb danger" onclick="confirmDelTeam('${secId}','${clId}','${tlId}')">Delete &amp; Move to Pool</button>
+      </div>`;
+    document.getElementById('mbd').classList.add('on');
+  } else {
+    confirmDelTeam(secId,clId,tlId);
+  }
+}
+
+function confirmDelTeam(secId,clId,tlId){
+  const sf=SECS.find(s=>s.id===secId);const cl=sf&&sf.clusters.find(c=>c.id===clId);if(!cl)return;
+  const idx=cl.teams.findIndex(t=>t.id===tlId);if(idx<0)return;
+  const tl=JSON.parse(JSON.stringify(cl.teams[idx]));
+  // Move members to pool
+  tl.members.forEach(m=>{pool.push({...m,pid:m.id+'_p_'+Date.now()});});
+  cl.teams.splice(idx,1);
+  hist.push({lbl:`Deleted team line from ${cl.name}`,time:now(),user:CU,type:'delTeam',secId,clId,idx,tl});
+  persist();render();closeMod();
+  toast(`Team line deleted — ${tl.members.length} members moved to pool`);
+}
+
+// ── SAVES ─────────────────────────────────────────────────────────────
+function getSaves(){try{return JSON.parse(localStorage.getItem('tdm3_saves')||'[]');}catch{return[];}}
+function setSaves(a){localStorage.setItem('tdm3_saves',JSON.stringify(a));}
+
+function doSave(){
+  const n=document.getElementById('sni').value.trim();if(!n){toast('Enter a name');return;}
+  const sv=getSaves();
+  sv.unshift({name:n,date:new Date().toLocaleString(),user:CU,secs:JSON.parse(JSON.stringify(SECS)),pool:JSON.parse(JSON.stringify(pool))});
+  setSaves(sv);document.getElementById('sni').value='';renderSaves();toast('Saved: '+n);
+}
+function quickSave(){
+  const sv=getSaves();
+  sv.unshift({name:'Quick '+now(),date:new Date().toLocaleString(),user:CU,secs:JSON.parse(JSON.stringify(SECS)),pool:JSON.parse(JSON.stringify(pool))});
+  if(sv.length>20)sv.pop();setSaves(sv);renderSaves();toast('Layout saved');
+}
+function loadSave(i){
+  const s=getSaves()[i];if(!s)return;
+  document.getElementById('mbox').innerHTML=`<h3>Load layout?</h3><p style="font-size:13px;color:var(--text2);margin-bottom:16px">Load "${s.name}"? Current board will be replaced.</p><div class="mbtns"><button class="mb" onclick="closeMod()">Cancel</button><button class="mb ok" onclick="doLoadSave(${i})">Load</button></div>`;
+  document.getElementById('mbd').classList.add('on');
+}
+function doLoadSave(i){
+  const s=getSaves()[i];SECS=JSON.parse(JSON.stringify(s.secs));pool=JSON.parse(JSON.stringify(s.pool||[]));hist=[];persist();render();
+  showPg('board',document.querySelector('.ntab'));closeMod();toast('Loaded: '+s.name);
+}
+function deleteSave(i){
+  const sv=getSaves();sv.splice(i,1);setSaves(sv);renderSaves();toast('Deleted');
+}
+function renderSaves(){
+  const sv=getSaves();const g=document.getElementById('sgrid');
+  if(!sv.length){g.innerHTML='<div class="nosave">No saves yet.</div>';return;}
+  g.innerHTML=`<div class="sgrid">${sv.map((s,i)=>`<div class="scard"><div><h3>${s.name}</h3><div class="sm">${s.date} · ${s.user||'?'}</div></div><div class="sa2"><button class="scb ld" onclick="loadSave(${i})">Load</button><button class="scb dl" onclick="deleteSave(${i})">Delete</button></div></div>`).join('')}</div>`;
+}
+
+// ── ANALYTICS ────────────────────────────────────────────────────────
+function renderAnalytics(){
+  const all=[];let totalDaysAll=0;let totalPPMDaysAll=0;let totalPPMWorkersAll=0;
+  SECS.forEach(s=>s.clusters.forEach(cl=>{
+    cl.teams.forEach(tl=>{
+      totalDaysAll+=parseInt(tl.manDays)||0;
+      if(isPPMTeam(tl)){totalPPMDaysAll+=parseInt(tl.manDays)||0;totalPPMWorkersAll+=ppmWorkerCount(tl);}
+      tl.members.forEach(m=>all.push({...m,sec:s.label,cluster:cl.name,teamType:tl.type}));
+    });
+  }));
+  const totalM=all.length,unassigned=pool.length;
+  const avsCnt=all.filter(m=>AVS.has(m.name)).length;
+  const subCnt=all.filter(m=>m.role==='Sub Team').length;
+  const roles={};all.forEach(m=>{roles[m.role]=(roles[m.role]||0)+1;});
+  const acCnt={};all.forEach(m=>(m.accom||[]).forEach(a=>{acCnt[a]=(acCnt[a]||0)+1;}));
+  const secCnt={};SECS.forEach(s=>{secCnt[s.label.split('—')[0].trim()]=s.clusters.reduce((a,c)=>a+totalClusterMembers(c),0);});
+  const wtCnt={};all.forEach(m=>{wtCnt[m.teamType]=(wtCnt[m.teamType]||0)+1;});
+  const mxR=Math.max(...Object.values(roles),1),mxS=Math.max(...Object.values(secCnt),1),mxW=Math.max(...Object.values(wtCnt),1);
+
+  document.getElementById('acontent').innerHTML=`
+  <div class="agrid">
+    <div class="acard"><div class="albl">Total assigned</div><div class="aval">${totalM}</div></div>
+    <div class="acard"><div class="albl">Unassigned</div><div class="aval" style="color:${unassigned?'#D97706':'#16A34A'}">${unassigned}</div></div>
+    <div class="acard"><div class="albl">PPM Man Days</div><div class="aval" style="color:#2563EB">${totalPPMDaysAll}</div><div class="asub">Callout / Non-PPM excluded</div></div>
+    <div class="acard"><div class="albl">PPM Workers</div><div class="aval" style="color:#0D9488">${totalPPMWorkersAll}</div><div class="asub">Excl. Site Mgr &amp; Lead Tech</div></div>
+    <div class="acard"><div class="albl">AVS Members</div><div class="aval" style="color:#7C3AED">${avsCnt}</div></div>
+    <div class="acard"><div class="albl">Sub Team</div><div class="aval" style="color:#D97706">${subCnt}</div></div>
+    <div class="acard"><div class="albl">Move History</div><div class="aval">${hist.length}</div></div>
+  </div>
+  <div class="arow">
+    <div class="ablk"><h3>By role</h3>${Object.entries(roles).sort((a,b)=>b[1]-a[1]).map(([r,n])=>`<div class="br"><div class="brl">${r}</div><div class="brt"><div class="brf" style="width:${Math.round(n/mxR*100)}%;background:${RC[r]||'#888'}"></div></div><div class="brn">${n}</div></div>`).join('')}</div>
+    <div class="ablk"><h3>By work type</h3>${Object.entries(wtCnt).map(([k,n])=>{const wt=wtInfo(k);return`<div class="br"><div class="brl">${wt.label}</div><div class="brt"><div class="brf" style="width:${Math.round(n/mxW*100)}%;background:${wt.color}"></div></div><div class="brn">${n}</div></div>`;}).join('')}</div>
+  </div>
+  <div class="ablk" style="margin-bottom:12px"><h3>Man Days by cluster</h3>
+  ${SECS.map(s=>s.clusters.map(cl=>{
+    const ppmDays=totalPPMDays(cl);const ppmTeamCt=ppmTeamsOnly(cl).length;
+    const ppmWorkers=ppmTeamsOnly(cl).reduce((a,t)=>a+ppmWorkerCount(t),0);
+    const warnedTotal=ppmTeamsOnly(cl).reduce((a,t)=>a+ppmWarningMembers(t).length,0);
+    return ppmDays>0?`<div class="br" style="flex-wrap:wrap;gap:4px">
+      <div class="brl" style="width:160px">${cl.name.split('—')[0].trim()}</div>
+      <div style="font-size:11px;color:#2563EB;flex-shrink:0">${ppmDays} days</div>
+      <div style="font-size:11px;color:var(--text3);flex-shrink:0">${ppmTeamCt} PPM team${ppmTeamCt!==1?'s':''}</div>
+      <div style="font-size:11px;color:#0D9488;flex-shrink:0">${ppmWorkers} worker${ppmWorkers!==1?'s':''}</div>
+      ${warnedTotal>0?`<div style="font-size:11px;color:#D97706">⚠ ${warnedTotal} excluded</div>`:''}
+    </div>`:'';
+  }).join('')).join('')}
+  </div>
+  <div class="ablk"><h3>Accommodation breakdown</h3>
+  <table class="atable"><tr><th>Code</th><th>Location</th><th>Count</th><th>Members</th></tr>
+  ${[['HAZ','Hor Al Anz'],['RAK','Ras Al Khor'],['AKG','Al Kail Gate'],['SHJ','Sharjah'],['PER','Personal'],['DIP','DIP']].map(([cd,loc])=>{
+    const cnt=acCnt[cd]||0,mems=all.filter(m=>(m.accom||[]).includes(cd)).map(m=>m.name).join(', ');
+    return `<tr><td><span class="ap" style="background:${AC[cd][0]};color:${AC[cd][1]}">${cd}</span></td><td>${loc}</td><td><strong>${cnt}</strong></td><td style="font-size:10px;color:var(--text2)">${mems||'—'}</td></tr>`;
+  }).join('')}</table></div>`;
+}
+
+// ── EXPORT ────────────────────────────────────────────────────────────
+function doExport(){
+  const lines=['TEAM DISTRIBUTION PLAN','Generated: '+new Date().toLocaleString()+' by '+CU,'='.repeat(50),''];
+  SECS.forEach(s=>{
+    lines.push(s.label.toUpperCase());
+    s.clusters.forEach(cl=>{
+      const totalDays=totalClusterDays(cl);
+      lines.push(`  ${cl.name}${totalDays?` [${totalDays} Man Days]`:''}`);
+      cl.teams.forEach((tl,i)=>{
+        const wt=wtInfo(tl.type);const ppmTag=isPPMTeam(tl)?'[PPM]':'[Non-PPM — not in PPM count]';
+        lines.push(`    Team ${i+1}: ${wt.label} ${ppmTag}${tl.manDays?' — '+tl.manDays+' days':''}`);
+        tl.members.forEach(function(m){var lics=m.licDriving?'Driving lic':'';lines.push('      ['+m.role+'] '+m.name+(m.accom&&m.accom.length?' ['+m.accom.join(', ')+']':'')+(lics?' {'+lics+'}':''));});
+      });
+    });lines.push('');
+  });
+  if(pool.length){lines.push('UNASSIGNED:');pool.forEach(p=>lines.push(`  [${p.role}] ${p.name}`));lines.push('');}
+  if(hist.length){lines.push('MOVE HISTORY:');hist.forEach((h,i)=>lines.push(`  ${i+1}. ${h.lbl} (${h.time})`));}
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/plain'}));
+  a.download='team_plan.txt';a.click();toast('Exported!');
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────
+function now(){return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
+let tT;
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('on'),2400);}
+function closeMod(){document.getElementById('mbd').classList.remove('on');}
+function showPg(id,btn){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.ntab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('pg-'+id).classList.add('on');
+  document.querySelectorAll('.ntab').forEach(b=>{if(b.textContent.toLowerCase().includes(id.slice(0,4)))b.classList.add('on');});
+  if(id==='analytics')renderAnalytics();
+  if(id==='saves')renderSaves();
+}
+
+// ── DUPLICATE PLAN ────────────────────────────────────────────────────
+function duplicatePlan(){
+  var dpName=prompt('Name for the duplicate plan:','Copy '+nowStr());if(!dpName) return;(function(name){
+    if(!name) return;
+    const sv=getSaves();
+    sv.unshift({
+      name:name,
+      date:new Date().toLocaleString(),
+      user:CU,
+      state:JSON.parse(JSON.stringify(SECS)),
+      pool:JSON.parse(JSON.stringify(pool))
+    });
+    setSaves(sv);
+    renderSaves();
+    toast('Duplicate saved: '+name);
+  })(dpName);
+}
+
+// ── EXCEL EXPORT ──────────────────────────────────────────────────────
+function exportExcel(){
+  // Build CSV-compatible tab-separated content, then wrap as XLS
+  var rows=[];
+  rows.push(['Section','Cluster','Man Days','Team Type','#','Role','Name','Accommodation','Driving Lic','PPM Worker']);
+  SECS.forEach(function(s){
+    s.clusters.forEach(function(cl){
+      var ppmD=cl.teams.filter(function(t){return t.type==='PPM';}).reduce(function(a,t){return a+(parseInt(t.manDays)||0);},0);
+      cl.teams.forEach(function(tl,ti){
+        var wt=wtInfo(tl.type);
+        tl.members.forEach(function(m,mi){
+          var isPPMW=!PPM_ROLES_EXCLUDED.has(m.role);
+          rows.push([
+            s.label,
+            cl.name,
+            (tl.type==='PPM'?(ppmD+' days (PPM)'):'—'),
+            wt.label+(tl.type==='PPM'?' [PPM]':'[Non-PPM]'),
+            mi+1,
+            m.role,
+            m.name,
+            (m.accom&&m.accom.length?m.accom.join(', '):''),
+            m.licDriving?'Yes':'',
+            (tl.type==='PPM'?(isPPMW?'Yes':'Excluded'):'—')
+          ]);
+        });
+        if(tl.members.length>0) rows.push(['','','','','','','','','','']);
+      });
+    });
+  });
+  if(pool.length){
+    rows.push(['UNASSIGNED POOL','','','','','','','','','']);
+    pool.forEach(function(p){
+      rows.push(['',p.name,'','','','',p.role,(p.accom&&p.accom.length?p.accom.join(', '):''),p.licDriving?'Yes':'','']);
+    });
+  }
+
+  // Build HTML table for Excel (opens natively in Excel)
+  var html='<html><head><meta charset="UTF-8"><style>';
+  html+='body{font-family:Arial,sans-serif;font-size:11pt}';
+  html+='table{border-collapse:collapse;width:100%}';
+  html+='th{background:#0F1C2E;color:#fff;padding:6px 10px;text-align:left;font-size:10pt;border:1px solid #0F1C2E}';
+  html+='td{padding:5px 10px;border:1px solid #E2E8F0;font-size:10pt;vertical-align:top}';
+  html+='.sec{background:#EFF6FF;font-weight:bold;color:#1E3A5F}';
+  html+='.cluster{background:#F1F5F9;font-weight:bold}';
+  html+='.ppm{background:#DBEAFE;color:#1D4ED8;font-weight:bold}';
+  html+='.nonppm{background:#EDE9FE;color:#6D28D9}';
+  html+='.excl{color:#D97706;font-style:italic}';
+  html+='.lic{color:#2563EB;font-weight:bold}';
+  html+='</style></head><body>';
+  html+='<h2 style="font-family:Arial;color:#0F1C2E">Team Distribution Plan</h2>';
+  html+='<p style="font-family:Arial;font-size:10pt;color:#475569">Generated: '+new Date().toLocaleString()+' by '+CU+'</p><br>';
+
+  SECS.forEach(function(s){
+    html+='<h3 style="font-family:Arial;color:'+s.color+';margin:16px 0 6px">'+s.label+'</h3>';
+    s.clusters.forEach(function(cl){
+      var ppmD=cl.teams.filter(function(t){return t.type==='PPM';}).reduce(function(a,t){return a+(parseInt(t.manDays)||0);},0);
+      html+='<p style="font-family:Arial;font-size:10pt;font-weight:bold;color:#1E293B;margin:10px 0 4px">'+cl.name+(ppmD>0?' &nbsp;<span style="font-size:9pt;color:#2563EB;background:#DBEAFE;padding:1px 6px;border-radius:4px">'+ppmD+' PPM Days</span>':'')+'</p>';
+      html+='<table><tr><th>Team</th><th>#</th><th>Role</th><th>Name</th><th>Accommodation</th><th>Driving</th><th>PPM Worker</th></tr>';
+      cl.teams.forEach(function(tl){
+        var wt=wtInfo(tl.type);
+        tl.members.forEach(function(m,mi){
+          var isPPMW=!PPM_ROLES_EXCLUDED.has(m.role);
+          var rowCls=tl.type==='PPM'?'ppm':'nonppm';
+          html+='<tr>';
+          if(mi===0) html+='<td rowspan="'+tl.members.length+'" class="'+rowCls+'" style="vertical-align:middle;text-align:center">'+wt.label+(tl.type==='PPM'?'<br><small>'+tl.manDays+' days</small>':'')+'</td>';
+          html+='<td style="color:#94A3B8;text-align:center">'+(mi+1)+'</td>';
+          html+='<td style="color:'+( RC[m.role]||'#475569')+'">'+m.role+'</td>';
+          html+='<td style="font-weight:500">'+m.name+'</td>';
+          html+='<td style="font-size:9pt">'+(m.accom&&m.accom.length?m.accom.join(' '):'')+'</td>';
+          html+='<td class="lic" style="text-align:center">'+(m.licDriving?'&#9881;':'')+'</td>';
+          html+='<td style="text-align:center;font-size:9pt">'+(tl.type==='PPM'?(isPPMW?'<span style=color:#16A34A>Yes</span>':'<span class=excl>Excl.</span>'):'—')+'</td>';
+          html+='</tr>';
+        });
+      });
+      html+='</table><br>';
+    });
+  });
+
+  if(pool.length){
+    html+='<h3 style="font-family:Arial;color:#475569;margin:16px 0 6px">Unassigned Pool</h3>';
+    html+='<table><tr><th>Name</th><th>Role</th><th>Accommodation</th><th>Driving</th></tr>';
+    pool.forEach(function(p){
+      html+='<tr><td style="font-weight:500">'+p.name+'</td><td>'+p.role+'</td><td>'+(p.accom&&p.accom.length?p.accom.join(' '):'')+'</td><td>'+(p.licDriving?'&#9881;':'')+'</td></tr>';
+    });
+    html+='</table>';
+  }
+
+  html+='</body></html>';
+  var blob=new Blob([html],{type:'application/vnd.ms-excel;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url; a.download='Team_Distribution_'+new Date().toISOString().slice(0,10)+'.xls';
+  a.click(); URL.revokeObjectURL(url);
+  toast('Excel exported!');
+}
+
+</script>
+</body>
+</html>
